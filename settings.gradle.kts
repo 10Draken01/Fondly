@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -23,4 +24,16 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Fondly"
+
 include(":app")
+
+include(":core:domain")
+include(":core:application")
+include(":core:infrastructure")
+include(":core:ui-common")
+
+include(":feature:balances")
+include(":feature:transactions")
+include(":feature:recurring")
+include(":feature:savings")
+include(":feature:settings")

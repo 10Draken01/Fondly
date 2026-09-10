@@ -76,3 +76,40 @@ Cada `Transaction` es un registro inmutable (nunca se edita ni se borra físicam
 - **Transferencia física completa entre "cuentas" independientes**: descartada porque no hay múltiples cuentas bancarias reales involucradas — es una sola bolsa de dinero del usuario vista en distintas categorías/periodos.
 - **Saldos hijo como límites de validación sin conexión real de dinero**: descartada porque rompería la garantía de que el dinero disponible siempre cuadra con la realidad; permitiría, por ejemplo, gastar el mismo dinero "en teoría disponible" en dos saldos hijo distintos sin que el padre se entere.
 - **Cascada bidireccional (hijo y hermanos)**: descartada por generar doble conteo y complejidad innecesaria; no resuelve ningún caso de uso adicional frente a la cascada unidireccional hacia ancestros.
+
+---
+
+## ADR-0002: Migración a arquitectura Multi-Módulo
+
+**Estado**: Aceptada
+**Fecha**: 2026-09-07
+**Sustituye parcialmente**: la sección de "Arquitectura" de este documento, que originalmente descartaba multi-módulo por sobreingeniería.
+
+### Contexto
+
+La decisión original (ver más arriba) fue no modularizar, por ser innecesario a la escala inicial del proyecto. Sin embargo, se decidió priorizar **escalabilidad a largo plazo** por sobre el costo de configuración adicional, y aprovechar que el proyecto aún es pequeño (el momento más barato para migrar).
+
+### Decisión
+
+Se adopta una estructura multi-módulo con **Convention Plugins** (vía un `build-logic` incluido) para evitar repetir configuración en cada módulo. Módulos:
+
+- `core:domain` — **módulo JVM puro** (sin Android). Contiene `model/` y `port/`. El compilador impide, a nivel de classpath, que este módulo dependa de Room, Android o cualquier framework.
+- `core:application` — **módulo JVM puro**. Contiene `usecase/`. Depende solo de `core:domain`.
+- `core:infrastructure` — módulo Android Library. Implementa los Ports (Room, WorkManager). Depende de `core:domain`.
+- `core:ui-common` — módulo Android Library. Tema, componentes Compose compartidos entre features.
+- `feature:balances`, `feature:transactions`, `feature:recurring`, `feature:savings`, `feature:settings` — módulos Android Library, uno por área funcional cohesiva (no uno por pantalla individual, para evitar una explosión de módulos triviales). Cada uno depende de `core:domain`, `core:application`, `core:ui-common` — nunca de `core:infrastructure` ni de otro `feature:*`.
+- `app` — ensambla todos los `feature:*` + `core:infrastructure`, contiene `FondlyApplication`, `MainActivity`, navegación raíz.
+
+### Reglas de dependencia (impuestas por Gradle, no solo documentadas)
+
+```
+feature:* / app  →  core:application  →  core:domain  ←  core:infrastructure
+                 →  core:ui-common
+```
+
+### Consecuencias
+
+- El aislamiento del dominio deja de depender de la disciplina del desarrollador — es imposible importar Room en `core:domain` porque ese módulo no lo tiene en su classpath.
+- Se gana compilación incremental y en paralelo entre módulos.
+- Se paga el costo de mantener `build-logic/` y un `build.gradle.kts` por módulo (mitigado por los Convention Plugins).
+- Este ADR reemplaza el diagrama de carpetas de `architecture.md`; ese documento se actualiza para reflejar módulos Gradle reales en vez de paquetes dentro de un único módulo `app`.
