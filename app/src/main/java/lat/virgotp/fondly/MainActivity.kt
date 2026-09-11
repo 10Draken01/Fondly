@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import dagger.hilt.android.AndroidEntryPoint
-import lat.virgotp.fondly.feature.balances.dashboard.DashboardScreen
+import lat.virgotp.fondly.feature.balances.BalancesNavHost
 import lat.virgotp.fondly.uicommon.theme.FondlyTheme
 
 @AndroidEntryPoint
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FondlyTheme {
-                DashboardScreen()
+                BalancesNavHost()
             }
         }
     }
