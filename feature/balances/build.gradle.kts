@@ -11,7 +11,7 @@ android {
 dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:application"))
-    implementation(project(":core:ui-common"))
+    implementation(project(":core:ui_common"))
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
@@ -19,4 +19,6 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.9.8")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation(libs.androidx.ui)
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
 }

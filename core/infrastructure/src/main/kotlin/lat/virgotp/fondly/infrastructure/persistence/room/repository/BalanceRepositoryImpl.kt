@@ -26,11 +26,18 @@ class BalanceRepositoryImpl @Inject constructor(
     override suspend fun getById(id: Long): Balance? =
         dao.getById(id)?.toDomain()
 
+    override suspend fun getDeactiveChildrenOf(parentId: Long): List<Balance> =
+        dao.getActiveChildrenOf(parentId).map { it.toDomain() }
+
     override suspend fun getActiveChildrenOf(parentId: Long): List<Balance> =
         dao.getActiveChildrenOf(parentId).map { it.toDomain() }
 
     override suspend fun deactivate(id: Long) {
         dao.deactivate(id)
+    }
+
+    override suspend fun activate(id: Long) {
+        dao.activate(id)
     }
 
     override suspend fun deleteById(id: Long) {
@@ -39,4 +46,10 @@ class BalanceRepositoryImpl @Inject constructor(
 
     override suspend fun countActiveChildren(parentId: Long): Int =
         dao.countActiveChildren(parentId)
+
+        override fun getAllBalances(): Flow<List<Balance>> =
+        dao.getAllBalances().map { list -> list.map { it.toDomain() } }
+
+    override suspend fun getChildrenOf(parentId: Long): List<Balance> =
+        dao.getChildrenOf(parentId).map { it.toDomain() }
 }

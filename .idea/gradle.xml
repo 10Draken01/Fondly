@@ -28,11 +28,12 @@
             <option value="$PROJECT_DIR$/core/application" />
             <option value="$PROJECT_DIR$/core/domain" />
             <option value="$PROJECT_DIR$/core/infrastructure" />
-            <option value="$PROJECT_DIR$/core/ui-common" />
+            <option value="$PROJECT_DIR$/core/ui_common" />
             <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/balance_sections" />
             <option value="$PROJECT_DIR$/feature/balances" />
+            <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/recurring" />
-            <option value="$PROJECT_DIR$/feature/savings" />
             <option value="$PROJECT_DIR$/feature/settings" />
             <option value="$PROJECT_DIR$/feature/transactions" />
           </set>

@@ -45,12 +45,13 @@ kotlin {
 
 dependencies {
     implementation(project(":core:infrastructure"))
-    implementation(project(":core:ui-common"))  
+    implementation(project(":core:ui_common"))
     implementation(project(":feature:balances"))
     implementation(project(":feature:transactions"))
     implementation(project(":feature:recurring"))
-    implementation(project(":feature:savings"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:balance_sections"))
+    implementation(project(":feature:home"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

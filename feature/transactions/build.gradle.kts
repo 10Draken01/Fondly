@@ -11,5 +11,5 @@ android {
 dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:application"))
-    implementation(project(":core:ui-common"))
+    implementation(project(":core:ui_common"))
 }

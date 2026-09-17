@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="11" />
+    <bytecodeTargetLevel target="11">
+      <module name="Fondly.core.ui-common" target="25" />
+      <module name="Fondly.feature.balance-sections" target="25" />
+      <module name="Fondly.feature.savings" target="25" />
+      <module name="Fondly.feature.sections" target="25" />
+    </bytecodeTargetLevel>
   </component>
 </project>
