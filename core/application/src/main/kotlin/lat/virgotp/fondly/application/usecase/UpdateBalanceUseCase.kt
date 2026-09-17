@@ -11,14 +11,15 @@ class UpdateBalanceUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(balance: Balance): Result<Unit> {
         return try {
+            var updatedBalance = balance
             balance.parentBalanceId?.let { parentId ->
                 val parent = repository.getById(parentId)
                     ?: throw ParentBalanceNotFoundException(parentId)
 
                 val siblings = repository.getActiveChildrenOf(parentId)
-                    .filter { it.id != balance.id }
+                    .filter { it.id != updatedBalance.id }
                 val sumOfSiblings = siblings.sumOf { it.targetAmount }
-                val attemptedTotal = sumOfSiblings + balance.targetAmount
+                val attemptedTotal = sumOfSiblings + updatedBalance.targetAmount
 
                 if (attemptedTotal > parent.available) {
                     throw ParentBalanceExceededException(
@@ -28,7 +29,7 @@ class UpdateBalanceUseCase @Inject constructor(
                 }
             }
 
-            repository.update(balance)
+            repository.update(updatedBalance)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

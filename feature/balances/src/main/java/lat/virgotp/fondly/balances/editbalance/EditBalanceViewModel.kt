@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import lat.virgotp.fondly.application.usecase.GetBalanceByIdUseCase
+import lat.virgotp.fondly.application.usecase.ResetBalanceByIdUseCase
 import lat.virgotp.fondly.application.usecase.UpdateBalanceUseCase
 import lat.virgotp.fondly.domain.model.Balance
 import lat.virgotp.fondly.domain.model.BalanceType
@@ -33,14 +34,17 @@ data class EditBalanceUiState(
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
-    val savedSuccessfully: Boolean = false
+    val savedSuccessfully: Boolean = false,
+    // valor para renovar el balance
+    val resetBalanceAndChildren: Boolean = false,
 )
 
 @HiltViewModel
 class EditBalanceViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getBalanceById: GetBalanceByIdUseCase,
-    private val updateBalance: UpdateBalanceUseCase
+    private val updateBalance: UpdateBalanceUseCase,
+    private val resetBalanceByIdUseCase: ResetBalanceByIdUseCase
 ) : ViewModel() {
 
     private val balanceId: Long = checkNotNull(savedStateHandle["balanceId"])
@@ -86,6 +90,8 @@ class EditBalanceViewModel @Inject constructor(
     fun onRolloverChange(v: RolloverStrategy) = _uiState.update { it.copy(rolloverStrategy = v) }
     fun onRebalanceChange(v: RebalanceStrategy) = _uiState.update { it.copy(rebalanceStrategy = v) }
     fun onAllowOverdraftChange(v: Boolean) = _uiState.update { it.copy(allowOverdraft = v) }
+
+    fun onResetBalanceAndChildren(v: Boolean) = _uiState.update { it.copy(resetBalanceAndChildren = v) }
     fun onNotificationThresholdChange(v: String) = _uiState.update { it.copy(notificationThreshold = v) }
     fun onIsActiveChange(v: Boolean) = _uiState.update { it.copy(isActive = v) }
 
@@ -120,7 +126,28 @@ class EditBalanceViewModel @Inject constructor(
                             isActive = state.isActive
                         )
                     ).onSuccess {
-                        _uiState.update { it.copy(isSaving = false, savedSuccessfully = true) }
+                        if (state.resetBalanceAndChildren) {
+                            resetBalanceByIdUseCase(balance.id)
+                                .onSuccess {
+                                    _uiState.update {
+                                        it.copy(
+                                            isSaving = false,
+                                            savedSuccessfully = true
+                                        )
+                                    }
+                                }
+                                .onFailure { e ->
+
+                                    _uiState.update {
+                                        it.copy(
+                                            isSaving = false,
+                                            errorMessage = e.message
+                                        )
+                                    }
+                                }
+                        } else {
+                            _uiState.update { it.copy(isSaving = false, savedSuccessfully = true) }
+                        }
                     }.onFailure { e ->
                         _uiState.update { it.copy(isSaving = false, errorMessage = e.message) }
                     }

@@ -102,7 +102,8 @@ fun FondlyMainScreen() {
                     BalanceDetailScreen(
                         balanceId = id,
                         onEditClick = { navController.navigate("edit/$id") },
-                        onAddChildClick = { navController.navigate("create?parentId=$id") }
+                        onAddChildClick = { navController.navigate("create?parentId=$id") },
+                        onBack = { navController.popBackStack() }
                     )
                 }
                 composable(

@@ -38,23 +38,24 @@
 
 - **RF-020**: El sistema debe restaurar automáticamente el disponible de un `Balance` según su periodicidad configurada y su `rolloverStrategy` (`RESET`, `ACCUMULATE`, `TRANSFER_TO_SAVINGS`).
 - **RF-021**: Cada renovación debe ejecutarse exactamente una vez por periodo, sin duplicarse ni omitirse por reinicios, cambios de fecha/hora o zona horaria.
+- **RF-022**: El sistema debe permitir reajustar un `Balance` a travez de un boton para reanovar el saldo en su pantalla de detalles.
 
 ## Ahorro
 
-- **RF-022**: El sistema debe permitir marcar un `Balance` como tipo `SAVINGS`.
-- **RF-023**: El sistema debe calcular y mostrar un historial mensual de ahorro, agregando las transacciones que ingresaron a saldos de tipo `SAVINGS` en cada periodo.
+- **RF-023**: El sistema debe permitir marcar un `Balance` como tipo `SAVINGS`.
+- **RF-024**: El sistema debe calcular y mostrar un historial mensual de ahorro, agregando las transacciones que ingresaron a saldos de tipo `SAVINGS` en cada periodo.
 
 ## Notificaciones
 
-- **RF-024**: El sistema debe enviar notificaciones locales de advertencia cuando el disponible de un `Balance` caiga por debajo de un umbral configurable.
-- **RF-025**: El sistema debe permitir al usuario configurar qué tipos de notificación desea recibir, por saldo o de forma global.
+- **RF-025**: El sistema debe enviar notificaciones locales de advertencia cuando el disponible de un `Balance` caiga por debajo de un umbral configurable.
+- **RF-026**: El sistema debe permitir al usuario configurar qué tipos de notificación desea recibir, por saldo o de forma global.
 
 ## Configuración
 
-- **RF-026**: El sistema debe incluir una pantalla de Configuración con selector de tema (claro/oscuro/sistema).
-- **RF-027**: El sistema debe incluir en Configuración un selector de idioma (Español/Inglés), aplicado mediante `AppCompatDelegate.setApplicationLocales()`, independiente del idioma del sistema operativo.
+- **RF-027**: El sistema debe incluir una pantalla de Configuración con selector de tema (claro/oscuro/sistema).
+- **RF-028**: El sistema debe incluir en Configuración un selector de idioma (Español/Inglés), aplicado mediante `AppCompatDelegate.setApplicationLocales()`, independiente del idioma del sistema operativo.
 
 ## Historial y Consultas
 
-- **RF-028**: El sistema debe permitir consultar el historial de transacciones filtrado por `Balance`, rango de fechas y tipo (ingreso/gasto).
-- **RF-029**: El sistema debe permitir reconstruir el estado financiero completo de cualquier `Balance` a partir del historial de transacciones (ver ADR-0001, punto 9).
+- **RF-029**: El sistema debe permitir consultar el historial de transacciones filtrado por `Balance`, rango de fechas y tipo (ingreso/gasto).
+- **RF-030**: El sistema debe permitir reconstruir el estado financiero completo de cualquier `Balance` a partir del historial de transacciones (ver ADR-0001, punto 9).

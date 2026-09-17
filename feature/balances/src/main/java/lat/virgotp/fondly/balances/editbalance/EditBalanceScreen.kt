@@ -82,6 +82,12 @@ fun EditBalanceScreen(
                             Text("Permitir sobregiro", style = MaterialTheme.typography.bodyMedium, color = scheme.onSurface)
                         }
 
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = FondlySpacing.sm)) {
+                            Checkbox(uiState.resetBalanceAndChildren, viewModel::onResetBalanceAndChildren,
+                                colors = CheckboxDefaults.colors(checkedColor = scheme.primary, checkmarkColor = scheme.onPrimary))
+                            Text("Ajustar saldo al limite", style = MaterialTheme.typography.bodyMedium, color = scheme.onSurface)
+                        }
+
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Switch(
                                 checked = uiState.isActive,

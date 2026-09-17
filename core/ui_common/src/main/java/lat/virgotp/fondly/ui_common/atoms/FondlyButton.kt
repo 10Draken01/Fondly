@@ -7,13 +7,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,12 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import lat.virgotp.fondly.ui_common.theme.Motion
 import lat.virgotp.fondly.ui_common.theme.GoldGradientEnd
 import lat.virgotp.fondly.ui_common.theme.GoldGradientStart
+import lat.virgotp.fondly.ui_common.theme.SuccessGreen
 
-enum class FondlyButtonVariant { Primary, Secondary, Ghost, UtilRed, UtilTriggerOff, UtilTriggerOn }
+enum class FondlyButtonVariant { Primary, Secondary, Ghost, UtilRed, UtilTriggerOff, UtilTriggerOn, UtilSuccess }
 
 /**
  * Boton premium dorado.
@@ -36,8 +41,9 @@ enum class FondlyButtonVariant { Primary, Secondary, Ghost, UtilRed, UtilTrigger
  * - Secondary: contorno dorado con texto dorado.
  * - Ghost: solo texto dorado.
  * - UtilRed: Para botones de borrar o por el estilo
- * - UtilTriggerOff: Para botones que cambien de estado
- * - UtilTriggerOn: Para botones que cambien de estado
+ * - UtilTriggerOff: Para botones que cambien de estado (apagar/desactivar)
+ * - UtilTriggerOn: Para botones que cambien de estado (encender/activar)
+ * - UtilSuccess: Para acciones positivas puntuales (ej. renovar)
  */
 @Composable
 fun FondlyButton(
@@ -46,7 +52,8 @@ fun FondlyButton(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     enabled: Boolean = true,
-    variant: FondlyButtonVariant = FondlyButtonVariant.Primary
+    variant: FondlyButtonVariant = FondlyButtonVariant.Primary,
+    icon: ImageVector? = null
 ) {
     val scheme = MaterialTheme.colorScheme
     val interactionSource = remember { MutableInteractionSource() }
@@ -65,6 +72,7 @@ fun FondlyButton(
         FondlyButtonVariant.UtilRed -> scheme.errorContainer
         FondlyButtonVariant.UtilTriggerOff -> scheme.onSurfaceVariant
         FondlyButtonVariant.UtilTriggerOn -> scheme.surfaceVariant
+        FondlyButtonVariant.UtilSuccess -> SuccessGreen
     }
 
     val variantModifier = when (variant) {
@@ -91,6 +99,11 @@ fun FondlyButton(
         )
         FondlyButtonVariant.UtilTriggerOn -> Modifier.background(
             color = scheme.onSurfaceVariant,
+            shape = shape
+        )
+        FondlyButtonVariant.UtilSuccess -> Modifier.border(
+            width = 1.dp,
+            color = SuccessGreen.copy(alpha = 0.55f),
             shape = shape
         )
     }
@@ -124,6 +137,10 @@ fun FondlyButton(
                 color = contentColor
             )
         } else {
+            if (icon != null) {
+                Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+            }
             Text(text = text, style = MaterialTheme.typography.labelLarge)
         }
     }

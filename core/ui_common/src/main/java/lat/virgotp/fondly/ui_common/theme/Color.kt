@@ -28,6 +28,7 @@ val SlateBlue = Color(0xFF5B6B85)
 
 val BronzeDark = Color(0xFFD89B6E)
 val SlateBlueDark = Color(0xFFA9B8D4)
+val SuccessGreen = Color(0xFF2E8B57)
 
 internal val FondlyLightColors = lightColorScheme(
     primary = Gold700,

@@ -2,15 +2,11 @@ package lat.virgotp.fondly.ui_common.organisms
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,18 +14,21 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import lat.virgotp.fondly.domain.model.Balance
+import lat.virgotp.fondly.ui_common.atoms.BarSegment
+import lat.virgotp.fondly.ui_common.util.buildBalanceCardSegments
 import lat.virgotp.fondly.ui_common.atoms.CornerRibbon
-import lat.virgotp.fondly.ui_common.atoms.FondlyProgressBar
-import lat.virgotp.fondly.ui_common.atoms.FondlySegmentedProgressBar
 import lat.virgotp.fondly.ui_common.atoms.GlassSurface
+import lat.virgotp.fondly.ui_common.molecules.BalanceHeader
+import lat.virgotp.fondly.ui_common.molecules.BalanceProgressSection
+import lat.virgotp.fondly.ui_common.molecules.LegendItem
 import lat.virgotp.fondly.ui_common.theme.BalanceHierarchyColors
+import lat.virgotp.fondly.ui_common.theme.BalanceHierarchyIcons
+import lat.virgotp.fondly.ui_common.theme.BalanceSegmentColors
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
 import lat.virgotp.fondly.ui_common.theme.Motion
-import lat.virgotp.fondly.ui_common.util.FondlyMoney
+import lat.virgotp.fondly.ui_common.util.buildDescendantFractions
 
 @Composable
 fun BalanceCard(
@@ -45,21 +44,44 @@ fun BalanceCard(
     val hierarchyColor = BalanceHierarchyColors.forDepth(depth)
     val target = balance.targetAmount
 
-    val activeChildren = children.filter { it.isActive }
-    val lockedByChildren = activeChildren.sumOf { it.targetAmount }
-    val free = (target - lockedByChildren).coerceAtLeast(0.0)
-    val freeFraction = if (target > 0) (free / target).toFloat().coerceIn(0f, 1f) else 0f
-    val consumedFraction = if (target > 0) (balance.available / target).toFloat().coerceIn(0f, 1f) else 0f
+    // available = saldo LIBRE (no gastado ni reservado en apartados).
+    val freeFraction = if (target > 0) (balance.available / target).toFloat().coerceIn(0f, 1f) else 0f
+    val freeColor = scheme.primary   // dorado en ambos temas (Gold700 / E4BC55)
+    val usedColor = scheme.outline   // "vacio/consumido": neutro, obviamente distinto del dorado
 
-    val grayBase = scheme.onSurfaceVariant
-    val grays = listOf(0.50f, 0.65f, 0.80f, 0.95f).map { grayBase.copy(alpha = it) }
+    val childrenByParentId = remember(children) {
+        children.filter { it.parentBalanceId != null }.groupBy { it.parentBalanceId!! }
+    }
 
-    val segments: List<Pair<Float, Color>> =
-        if (activeChildren.isNotEmpty() && target > 0) {
-            activeChildren.mapIndexed { index, child ->
-                (child.targetAmount / target).toFloat().coerceIn(0f, 1f) to grays[index % grays.size]
-            }
-        } else emptyList()
+    val descendantFractions = remember(balance.id, target, childrenByParentId) {
+        buildDescendantFractions(
+            rootId = balance.id,
+            rootTargetAmount = target,
+            childrenByParentId = childrenByParentId
+        )
+    }
+
+    // Por telescopia, la suma de todos los niveles = target de los hijos DIRECTOS / target raiz.
+    val reservedFraction = descendantFractions.sumOf { it.fraction.toDouble() }.toFloat().coerceIn(0f, 1f)
+    val usedFraction = (1f - freeFraction - reservedFraction).coerceIn(0f, 1f)
+
+    // Colores por nivel resueltos AQUI (en contexto @Composable) porque
+    // BalanceSegmentColors.forLevel es @Composable y no puede llamarse
+    // dentro de una lambda comun como la que recibe buildBalanceCardSegments.
+    val levelColors = (1..8).map { BalanceSegmentColors.forLevel(it) }
+    val colorForLevel: (Int) -> Color = { lvl -> levelColors.getOrElse(lvl - 1) { levelColors.last() } }
+
+    val segments = buildBalanceCardSegments(
+        nodeId = balance.id,
+        target = target,
+        available = balance.available,
+        childrenByParentId = childrenByParentId,
+        freeColor = scheme.primary,
+        usedColor = scheme.outline,
+        colorForLevel = colorForLevel
+    )
+
+    val legendItems = segments.map { LegendItem(it.label, it.color) }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -79,93 +101,25 @@ fun BalanceCard(
     ) {
         GlassSurface(cornerRadius = 24.dp, glowColor = hierarchyColor) {
             Column(modifier = Modifier.padding(FondlySpacing.lg)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        Modifier.size(44.dp).clip(CircleShape)
-                            .background(hierarchyColor.copy(alpha = 0.14f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            balance.name.firstOrNull()?.uppercase() ?: "$",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = hierarchyColor
-                        )
-                    }
-                    Column(
-                        Modifier.padding(start = FondlySpacing.md).weight(1f)
-                    ) {
-                        Text(
-                            balance.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = scheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            parentName?.let { "${BalanceHierarchyColors.labelForDepth(depth)} · $it" }
-                                ?: BalanceHierarchyColors.labelForDepth(depth),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = hierarchyColor
-                        )
-                    }
-                    if (onEditClick != null) {
-                        IconButton(onClick = onEditClick) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = "Editar saldo",
-                                tint = hierarchyColor
-                            )
-                        }
-                    }
-                }
+                BalanceHeader(
+                    name = balance.name,
+                    hierarchyLabel = parentName?.let { "${BalanceHierarchyColors.labelForDepth(depth)} · $it" }
+                        ?: BalanceHierarchyColors.labelForDepth(depth),
+                    icon = BalanceHierarchyIcons.forDepth(depth),
+                    hierarchyColor = hierarchyColor,
+                    onEditClick = onEditClick
+                )
 
                 Spacer(Modifier.height(FondlySpacing.md))
 
-                if (segments.isNotEmpty()) {
-                    FondlySegmentedProgressBar(segments = segments)
-                } else {
-                    FondlyProgressBar(fraction = consumedFraction, progressColor = hierarchyColor)
-                }
-
-                Row(
-                    Modifier.fillMaxWidth().padding(top = FondlySpacing.sm),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            "Total: ${FondlyMoney.formatMXN(target)}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = scheme.onSurfaceVariant
-                        )
-                        if (segments.isNotEmpty()) {
-                            Text(
-                                "Libre: ${FondlyMoney.formatMXN(free)}",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = scheme.primary
-                            )
-                        } else {
-                            Text(
-                                "${FondlyMoney.formatMXN(balance.available)} disponibles",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = scheme.primary
-                            )
-                        }
-                    }
-                    if (segments.isNotEmpty()) {
-                        Text(
-                            "${(freeFraction * 100).roundToInt()}% libre",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = scheme.onSurfaceVariant
-                        )
-                    } else {
-                        Text(
-                            "${(consumedFraction * 100).roundToInt()}%",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = hierarchyColor
-                        )
-                    }
-                }
+                BalanceProgressSection(
+                    segments = segments,
+                    legendItems = legendItems,
+                    available = balance.available,
+                    target = target,
+                    freeFraction = freeFraction,
+                    freeColor = freeColor
+                )
             }
         }
         CornerRibbon(

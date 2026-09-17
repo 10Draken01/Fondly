@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import lat.virgotp.fondly.ui_common.theme.Motion
 
@@ -25,7 +26,8 @@ fun FondlyProgressBar(
     fraction: Float,
     modifier: Modifier = Modifier,
     trackColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-    progressColor: Color = MaterialTheme.colorScheme.primary
+    progressColor: Color = MaterialTheme.colorScheme.primary,
+    barHeight: Dp = 6.dp
 ) {
     val animatedFraction by animateFloatAsState(
         targetValue = fraction.coerceIn(0f, 1f),
@@ -36,14 +38,14 @@ fun FondlyProgressBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(6.dp)
+            .height(barHeight)
             .clip(RoundedCornerShape(50))
             .background(trackColor)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(animatedFraction)
-                .height(6.dp)
+                .height(barHeight)
                 .clip(RoundedCornerShape(50))
                 .background(
                     Brush.horizontalGradient(
