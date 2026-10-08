@@ -9,7 +9,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import lat.virgotp.fondly.uicommon.R
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
@@ -34,7 +36,7 @@ fun FondlySplashScreen(
                 Text("F", style = MaterialTheme.typography.displayMedium, color = scheme.primary)
             }
             Spacer(Modifier.height(FondlySpacing.lg))
-            Text("Fondly", style = MaterialTheme.typography.displaySmall, color = scheme.onBackground, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.app_brand), style = MaterialTheme.typography.displaySmall, color = scheme.onBackground, textAlign = TextAlign.Center)
             Spacer(Modifier.height(FondlySpacing.xl))
             CircularProgressIndicator(color = scheme.primary, strokeWidth = 3.dp, modifier = Modifier.size(32.dp))
         }

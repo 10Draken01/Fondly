@@ -15,7 +15,6 @@ import lat.virgotp.fondly.application.usecase.GetBalanceByIdUseCase
 import lat.virgotp.fondly.application.usecase.GetChildrenOfUseCase
 import lat.virgotp.fondly.application.usecase.ResetBalanceByIdUseCase
 import lat.virgotp.fondly.domain.model.Balance
-import lat.virgotp.fondly.feature.balances.detail.BalanceDetailUiState
 
 @HiltViewModel
 class BalanceDetailViewModel @Inject constructor(

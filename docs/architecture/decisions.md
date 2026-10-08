@@ -113,3 +113,52 @@ feature:* / app  →  core:application  →  core:domain  ←  core:infrastructu
 - Se gana compilación incremental y en paralelo entre módulos.
 - Se paga el costo de mantener `build-logic/` y un `build.gradle.kts` por módulo (mitigado por los Convention Plugins).
 - Este ADR reemplaza el diagrama de carpetas de `architecture.md`; ese documento se actualiza para reflejar módulos Gradle reales en vez de paquetes dentro de un único módulo `app`.
+---
+
+## ADR-0003: Modelo físico de datos — dinero en centavos, ledger inmutable y reconstruibilidad
+
+**Estado**: Aceptada
+**Fecha**: 2026-10-05
+**Complementa**: ADR-0001 (punto 9), ADR-0002
+
+### Contexto
+
+El Sprint 1 persistió dinero como SQLite `REAL` (`Double`), lo que contradecía `domain-model.md` (`BigDecimal`) y hacía imposible la reconstruibilidad exacta del caché `available` exigida por RNF-006. Antes de Sprint 2 (Transactions) fue necesario congelar el modelo físico.
+
+### Decisión
+
+1. **Dinero**: el dominio usa `java.math.BigDecimal` con `scale = 2` y `RoundingMode.HALF_EVEN`; está prohibido `Double`/`Float` para dinero en cualquier capa. Las comparaciones monetarias usan `compareTo()` (u operadores basados en él), nunca `equals()`. SQLite persiste dinero como `INTEGER` en **centavos** (`12345` = `$123.45 MXN`). La conversión `BigDecimal ↔ Long` vive **exclusivamente** en los mappers de `core:infrastructure` (`money().movePointRight(2).longValueExact()` / `BigDecimal(cents).movePointLeft(2)`); no existen TypeConverters globales de dinero. Valores con más de 2 decimales se normalizan en la frontera del dominio (constructor de la entidad / use case), nunca llegan crudos a persistencia.
+2. **Moneda**: MXN es la única moneda del MVP. No hay tabla `Currency` ni campo `currency` por saldo.
+3. **`Transaction`** es inmutable: el DAO solo expone `INSERT`/`SELECT`; las correcciones son nuevas transacciones `ADJUSTMENT` (BR-007). `amount` = precio **unitario** (centavos, > 0); `quantity` = unidades (> 0); el importe efectivo es `amount × quantity` (calculado, nunca persistido). `date` = fecha contable elegida por el usuario (ordena el historial); `createdAt` = timestamp de auditoría del sistema (nunca lógica de negocio). `recurringRuleId` nullable: NULL = transacción manual.
+4. **Renovaciones como `ADJUSTMENT` de sistema**: toda renovación que modifique materialmente `available` se registra como una `Transaction` de tipo `ADJUSTMENT` generada por el sistema (identificable por `type` + convención de `name`/`description`, sin entidades nuevas). Consecuencia: `Balance.available` se reconstruye con **agregación pura del ledger**.
+5. **Invariante INV-1 (reconstruibilidad)**: tras cualquier secuencia completa de operaciones committeadas, `RecalculateBalanceUseCase(b) - b.available = 0` para todo Balance `b`. Toda escritura que afecte `available` ocurre en la misma transacción SQLite que su causa (RNF-007).
+6. **FKs**: todas usan `ON DELETE RESTRICT`; está prohibido `CASCADE`. Un `Balance` con hijos, transacciones o reglas no puede eliminarse físicamente — solo desactivarse (BR-003, enforced por SQL).
+7. **Sobregiro**: si cualquier Balance de la cadena (destino + ancestros) tiene `allowOverdraft = false` y el gasto lo dejaría en `available < 0`, la operación completa se rechaza sin escribir nada. La validación y la escritura ocurren dentro de la misma transacción SQLite (`withTransaction` en `core:infrastructure`); el use case orquesta pero no transacciona.
+8. **Jerarquía**: árbol estricto (BR-001). Validación anti-ciclos en escritura (el nuevo padre no puede ser el propio nodo ni un descendiente) + guardia defensiva en lectura (conjunto de visitados, profundidad máxima 50).
+9. **`recurring_transaction_rules`** se crea en la migración v1→v2 (porque `transactions.recurring_rule_id` la referencia), aunque su ejecución se implemente en Sprint 3.
+10. **Índices aprobados**: `balances(parent_balance_id)`; `transactions(balance_id, date)` compuesto; `recurring_transaction_rules(balance_id)`; `recurring_transaction_rules(is_active)`. No hay índice en `transactions.recurring_rule_id` (la desactivación de reglas hace innecesario el borrado físico). Un índice `transactions(date)` se evaluará con el resumen mensual (Sprint 7), no antes.
+11. **Migraciones**: siempre explícitas (`Migration(from,to)`) con prueba `MigrationTestHelper`; `exportSchema = true` con los JSON de esquema versionados en Git; `fallbackToDestructiveMigration()` prohibido en todo build. Nunca se renombran valores de enums ya persistidos (se agregan, no se renombran).
+12. **`available` como caché materializado** (alternativa A de ADR-0001 punto 9, confirmada): justificado por RNF-001 y porque las renovaciones RESET romperían la suma pura del ledger si `available` fuera calculado.
+
+### Consecuencias
+
+- Migración v1→v2: recreación de `balances` (REAL→INTEGER con `ROUND(x*100)`), creación de `transactions` y `recurring_transaction_rules`, índices nuevos. Datos v1 preservados.
+- Los recálculos y validaciones de jerarquía usan la guardia compartida `BalanceHierarchyGuard` (`MAX_HIERARCHY_DEPTH = 50`).
+
+---
+
+## ADR-0004: Alineación de navegación, paquetes y strings
+
+**Estado**: Aceptada
+**Fecha**: 2026-10-05
+
+### Decisión
+
+1. **Rutas centralizadas**: `FondlyRoutes` (`core:ui_common/navigation`) es la única fuente de destinos y builders de rutas. Los features reciben callbacks (`onBalanceClick(id)`) y jamás construyen strings de ruta; el grafo vive en `feature:home`. Type-safe navigation queda evaluada para después del MVP.
+2. **Paquete = ruta física**: `feature/balance_sections` usa `lat.virgotp.fondly.balance_sections` (se elimina el package espurio `lat.virgotp.fondly.sections`). Regla: el package de un archivo siempre coincide con su path.
+3. **i18n**: español = idioma base (`values/strings.xml`), inglés = segundo idioma (`values-en/strings.xml`) (RNF-010/011, RF-027/028). Las excepciones de dominio conservan mensajes técnicos; la UI mapea tipos de error a recursos. La extracción completa de textos existentes es trabajo continuo pendiente previo a Sprint 2.
+
+### Consecuencias
+
+- Agregar un destino = agregar entrada en `FondlyRoutes` + `composable` en `feature:home`.
+- Todo PR que introduzca texto visible nuevo sin `stringResource` viola el DoD.

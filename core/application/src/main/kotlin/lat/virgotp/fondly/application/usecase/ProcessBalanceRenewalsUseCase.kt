@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.datetime.plus
 import lat.virgotp.fondly.domain.model.Periodicity
 import lat.virgotp.fondly.domain.model.RolloverStrategy
+import lat.virgotp.fondly.domain.model.money
 
 class ProcessBalanceRenewalsUseCase @Inject constructor(private val repository: BalanceRepository) {
     suspend operator fun invoke(): Result<Int> = try {
@@ -20,19 +21,20 @@ class ProcessBalanceRenewalsUseCase @Inject constructor(private val repository: 
         for (b in balances) {
             if (!b.isActive || b.periodicity == Periodicity.NONE || b.renewalDate == null) continue
             var next = b.renewalDate
-            var available = b.available
+            var available = b.available.money()
             var changed = false
             while (next!! <= today) {
                 available = when (b.rolloverStrategy) {
-                    RolloverStrategy.RESET -> b.targetAmount
-                    RolloverStrategy.ACCUMULATE -> available + (b.targetAmount - available).coerceAtLeast(0.0)
-                    RolloverStrategy.TRANSFER_TO_SAVINGS -> b.targetAmount
+                    RolloverStrategy.RESET -> b.targetAmount.money()
+                    RolloverStrategy.ACCUMULATE ->
+                        (available + (b.targetAmount - available).coerceAtLeast(java.math.BigDecimal.ZERO)).money()
+                    RolloverStrategy.TRANSFER_TO_SAVINGS -> b.targetAmount.money()
                 }
                 next = nextDate(next, b.periodicity)
                 changed = true
             }
             if (changed) {
-                repository.update(b.copy(available = available, renewalDate = next))
+                repository.update(b.copy(available = available.money(), renewalDate = next))
                 renewed++
             }
         }

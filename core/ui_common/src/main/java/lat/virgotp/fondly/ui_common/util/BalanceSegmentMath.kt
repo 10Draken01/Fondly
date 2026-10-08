@@ -1,5 +1,7 @@
 package lat.virgotp.fondly.ui_common.util
 
+import java.math.BigDecimal
+import java.math.RoundingMode
 import lat.virgotp.fondly.domain.model.Balance
 import lat.virgotp.fondly.ui_common.atoms.BarSegment
 import androidx.compose.ui.graphics.Color
@@ -8,9 +10,14 @@ import androidx.compose.ui.graphics.Color
 data class LeveledFraction(
     val level: Int,
     val fraction: Float,
-    val amount: Double,
+    val amount: BigDecimal,
     val label: String
 )
+
+/** División monetaria segura para derivar fracciones de pantalla (solo visual). */
+private fun BigDecimal.divideToFloat(other: BigDecimal): Float =
+    if (other.signum() == 0) 0f
+    else divide(other, 6, RoundingMode.HALF_EVEN).toFloat()
 
 /**
  * Recorre el arbol de apartados (hijos, nietos, bisnietos... nivel infinito)
@@ -30,10 +37,10 @@ data class LeveledFraction(
  */
 fun buildDescendantFractions(
     rootId: Long,
-    rootTargetAmount: Double,
+    rootTargetAmount: BigDecimal,
     childrenByParentId: Map<Long, List<Balance>>
 ): List<LeveledFraction> {
-    if (rootTargetAmount <= 0.0) return emptyList()
+    if (rootTargetAmount.signum() <= 0) return emptyList()
 
     val result = mutableListOf<LeveledFraction>()
     var currentLevel = childrenByParentId[rootId].orEmpty().filter { it.isActive }
@@ -43,9 +50,9 @@ fun buildDescendantFractions(
         val nextLevel = mutableListOf<Balance>()
         for (node in currentLevel) {
             val activeChildren = childrenByParentId[node.id].orEmpty().filter { it.isActive }
-            val childrenSum = activeChildren.sumOf { it.targetAmount }
-            val ownAmount = (node.targetAmount - childrenSum).coerceAtLeast(0.0)
-            val ownFraction = (ownAmount / rootTargetAmount).toFloat().coerceIn(0f, 1f)
+            val childrenSum = activeChildren.fold(BigDecimal.ZERO) { acc, b -> acc + b.targetAmount }
+            val ownAmount = (node.targetAmount - childrenSum).coerceAtLeast(BigDecimal.ZERO)
+            val ownFraction = ownAmount.divideToFloat(rootTargetAmount).coerceIn(0f, 1f)
             if (ownFraction > 0f) {
                 result += LeveledFraction(level, ownFraction, ownAmount, node.name)
             }
@@ -123,25 +130,27 @@ fun distributeSegmentWidths(
  */
 fun buildBalanceCardSegments(
     nodeId: Long,
-    target: Double,
-    available: Double,
+    target: BigDecimal,
+    available: BigDecimal,
     childrenByParentId: Map<Long, List<Balance>>,
     freeColor: Color,
     usedColor: Color,
+    freeLabel: String,
+    usedLabel: String,
     colorForLevel: (Int) -> Color
 ): List<BarSegment> {
-    if (target <= 0.0) return emptyList()
+    if (target.signum() <= 0) return emptyList()
 
-    val freeFraction = (available / target).toFloat().coerceIn(0f, 1f)
+    val freeFraction = available.divideToFloat(target).coerceIn(0f, 1f)
     val descendantFractions = buildDescendantFractions(nodeId, target, childrenByParentId)
     val reservedFraction = descendantFractions.sumOf { it.fraction.toDouble() }.toFloat().coerceIn(0f, 1f)
     val usedFraction = (1f - freeFraction - reservedFraction).coerceIn(0f, 1f)
 
     return buildList {
-        if (freeFraction > 0f) add(BarSegment(freeFraction, freeColor, "Libre"))
+        if (freeFraction > 0f) add(BarSegment(freeFraction, freeColor, freeLabel))
         descendantFractions.forEach { leveled ->
             add(BarSegment(leveled.fraction, colorForLevel(leveled.level), leveled.label))
         }
-        if (usedFraction > 0f) add(BarSegment(usedFraction, usedColor, "Usado"))
+        if (usedFraction > 0f) add(BarSegment(usedFraction, usedColor, usedLabel))
     }
 }

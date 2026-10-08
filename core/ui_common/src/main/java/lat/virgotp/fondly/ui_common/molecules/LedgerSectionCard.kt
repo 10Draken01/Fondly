@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,8 +39,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import lat.virgotp.fondly.uicommon.R
 import lat.virgotp.fondly.ui_common.atoms.LedgerRow
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
+import lat.virgotp.fondly.ui_common.theme.Motion
 
 data class LedgerRowData(val label: String, val value: String, val icon: ImageVector? = null)
 
@@ -60,7 +64,13 @@ fun LedgerSectionCard(
     val scheme = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(16.dp)
     var expanded by remember { mutableStateOf(initiallyExpanded) }
-    val chevronRotation by animateFloatAsState(if (expanded) 180f else 0f, label = "chevronRotation")
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        animationSpec = Motion.defaultTween(),
+        label = "chevronRotation"
+    )
+    val expandLabel = stringResource(R.string.content_description_expand)
+    val collapseLabel = stringResource(R.string.content_description_collapse)
 
     Row(
         modifier = modifier
@@ -83,15 +93,24 @@ fun LedgerSectionCard(
                 Text(title, style = MaterialTheme.typography.titleMedium, color = scheme.onSurface)
                 Icon(
                     Icons.Filled.ExpandMore,
-                    contentDescription = if (expanded) "Colapsar" else "Expandir",
+                    contentDescription = if (expanded) collapseLabel else expandLabel,
                     tint = scheme.onSurfaceVariant,
                     modifier = Modifier.graphicsLayer { rotationZ = chevronRotation }
                 )
             }
+            // Transición simétrica y discreta: el tamaño de la card y el fade del
+            // contenido van sincronizados con la misma duración para que el cierre
+            // se sienta tan natural como la apertura (sin saltos de layout).
             AnimatedVisibility(
                 visible = expanded,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
+                enter = expandVertically(
+                    animationSpec = Motion.defaultTween(),
+                    expandFrom = Alignment.Top
+                ) + fadeIn(animationSpec = tween(Motion.DURATION_SHORT)),
+                exit = shrinkVertically(
+                    animationSpec = Motion.defaultTween(),
+                    shrinkTowards = Alignment.Top
+                ) + fadeOut(animationSpec = tween(Motion.DURATION_SHORT))
             ) {
                 Column(Modifier.padding(start = FondlySpacing.lg, end = FondlySpacing.lg, bottom = FondlySpacing.lg)) {
                     rows.forEachIndexed { index, row ->

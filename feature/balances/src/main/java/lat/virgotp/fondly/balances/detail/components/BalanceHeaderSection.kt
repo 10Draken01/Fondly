@@ -1,5 +1,6 @@
 package lat.virgotp.fondly.balances.detail.components
 
+import java.math.BigDecimal
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,8 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import lat.virgotp.fondly.feature.balances.R
 import lat.virgotp.fondly.ui_common.molecules.BalanceHeader
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
+import lat.virgotp.fondly.ui_common.theme.FondlyCurrencyController
 import lat.virgotp.fondly.ui_common.util.FondlyMoney
 
 /**
@@ -23,9 +27,10 @@ fun BalanceHeaderSection(
     hierarchyLabel: String,
     icon: ImageVector,
     hierarchyColor: Color,
-    available: Double,
+    available: BigDecimal,
     modifier: Modifier = Modifier
 ) {
+    val currency = FondlyCurrencyController.rememberCurrency()
     Column(modifier.fillMaxWidth()) {
         BalanceHeader(
             name = name,
@@ -35,13 +40,13 @@ fun BalanceHeaderSection(
             onEditClick = null
         )
         Text(
-            "DISPONIBLE",
+            stringResource(R.string.detail_available),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = FondlySpacing.md)
         )
         Text(
-            FondlyMoney.formatMXN(available),
+            FondlyMoney.format(available, currency),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.primary
         )

@@ -4,7 +4,7 @@
 
 **Arquitectura Hexagonal (Ports & Adapters, Alistair Cockburn) + MVVM + Use Cases.** Esta es una corrección respecto a la versión anterior de este documento: originalmente hablábamos de "Clean Architecture simplificada" con una carpeta genérica `data/`, pero eso generaba ambigüedad sobre dónde vive cada cosa y por qué. Adoptamos formalmente la terminología Hexagonal porque describe con precisión exacta lo que ya necesitábamos: un núcleo de negocio (`domain/`) que define **contratos** (Ports) sin saber cómo se implementan, y una capa externa (`infrastructure/`) que los **implementa** con tecnología concreta (Adapters).
 
-No se adopta modularización Gradle multi-módulo — sigue sin ser necesaria para el tamaño actual del proyecto (ver ADR-0001 y decisión original en `decisions.md`).
+**Actualización (ADR-0002)**: la arquitectura oficial SÍ es multi-módulo Gradle. Las capas descritas abajo son módulos reales: `core:domain`, `core:application`, `core:infrastructure`, `core:ui_common`, `feature:*` y `app` (composition root). Las reglas de dependencia las impone Gradle (ver ADR-0002 en `decisions.md`). Este párrafo sustituye a la decisión original de "single-module", que quedó obsoleta.
 
 ## Aclaración de terminología: dos significados de "Entity"
 
@@ -79,7 +79,7 @@ ui/  →  application/  →  domain/  ←  infrastructure/
 | MVVM | Sí | Estándar recomendado por Google para Compose. |
 | Use Cases | Sí | Las operaciones de este dominio (cascadas, reajustes, renovaciones) tienen complejidad de negocio suficiente para vivir aisladas y ser testeables sin UI ni Room. |
 | Repository (como Port) | Sí | Es, literalmente, el mecanismo Hexagonal para desacoplar dominio de infraestructura — no es un patrón aparte, es cómo se ve un Port en este contexto. |
-| Multi-módulo Gradle | No (por ahora) | Sigue siendo sobreingeniería para el tamaño actual. |
+| Multi-módulo Gradle | **Sí** (desde ADR-0002) | Modularización por capas/features con Convention Plugins en `build-logic`; el aislamiento del dominio lo garantiza el classpath, no la disciplina. |
 
 ## Flujo de una operación típica (ejemplo: registrar un gasto)
 

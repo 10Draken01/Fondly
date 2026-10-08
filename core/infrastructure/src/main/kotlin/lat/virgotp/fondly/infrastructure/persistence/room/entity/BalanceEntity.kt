@@ -6,6 +6,12 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+/**
+ * Tabla `balances`.
+ * Dinero: columnas monetarias son INTEGER en CENTAVOS (100 = $1.00 MXN).
+ * La conversión BigDecimal <-> centavos vive exclusivamente en BalanceMapper
+ * (ADR-0003). Jamás exponer Double/Float para dinero.
+ */
 @Entity(
     tableName = "balances",
     foreignKeys = [
@@ -13,7 +19,7 @@ import androidx.room.PrimaryKey
             entity = BalanceEntity::class,
             parentColumns = ["id"],
             childColumns = ["parent_balance_id"],
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.RESTRICT // BR-003: prohibido CASCADE en todo el esquema
         )
     ],
     indices = [Index("parent_balance_id")]
@@ -23,8 +29,8 @@ data class BalanceEntity(
     val id: Long = 0L,
     val name: String,
     @ColumnInfo(name = "target_amount")
-    val targetAmount: Double,
-    val available: Double,
+    val targetAmount: Long, // centavos MXN
+    val available: Long,    // centavos MXN (caché materializado, ver INV-1)
     val periodicity: String?,
     @ColumnInfo(name = "renewal_date")
     val renewalDate: String?,

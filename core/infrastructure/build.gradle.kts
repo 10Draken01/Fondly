@@ -5,6 +5,19 @@ plugins {
 
 android {
     namespace = "lat.virgotp.fondly.infrastructure"
+
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    sourceSets {
+        // MigrationTestHelper lee los JSON de esquema exportados como assets.
+        getByName("androidTest").assets.directories.add("$projectDir/schemas")
+    }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
@@ -18,4 +31,5 @@ dependencies {
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.room:room-testing:2.8.4") // MigrationTestHelper
 }

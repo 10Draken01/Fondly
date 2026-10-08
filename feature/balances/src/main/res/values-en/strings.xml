@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_title">Balances</string>
+    <string name="dashboard_total_available">TOTAL AVAILABLE</string>
+    <string name="dashboard_empty_title">You have no balances yet</string>
+    <string name="dashboard_empty_subtitle">Create your first balance with the gold button.</string>
+    <string name="action_create_balance">Create balance</string>
+
+    <string name="filter_active">Active</string>
+    <string name="filter_inactive">Inactive</string>
+    <string name="filter_all">All</string>
+
+    <string name="create_balance_title">Create balance</string>
+    <string name="create_section_title">New section</string>
+    <string name="create_balance_subtitle">Set up your first balance to start organizing your money.</string>
+    <string name="create_section_subtitle">Define the amount you will set aside from the parent balance.</string>
+    <string name="edit_balance_title">Edit balance</string>
+    <string name="section_general">General information</string>
+    <string name="section_renewal">Renewal</string>
+    <string name="section_options">Options</string>
+
+    <string name="field_name">Name</string>
+    <string name="field_name_placeholder">E.g. Weekly expenses</string>
+    <string name="field_target_amount">Target amount</string>
+    <string name="field_target_amount_placeholder">0.00</string>
+    <string name="field_description">Description (optional)</string>
+    <string name="field_description_placeholder">Notes about this balance</string>
+    <string name="field_type">Balance type</string>
+    <string name="field_periodicity">Renewal periodicity</string>
+    <string name="field_renewal_date">Renewal date</string>
+    <string name="field_rollover">On renewal (leftover)</string>
+    <string name="field_rebalance">Rebalance strategy</string>
+    <string name="field_overdraft">Allow overdraft</string>
+    <string name="field_overdraft_hint">Lets the available amount go negative on expenses.</string>
+    <string name="field_threshold">Notification threshold % (optional)</string>
+    <string name="field_reset_to_target">Reset balance to target</string>
+    <string name="field_reset_to_target_hint">Restores this balance and its sections back to the target amount.</string>
+    <string name="field_balance_active">Balance active</string>
+    <string name="field_balance_inactive">Balance inactive</string>
+
+    <string name="error_name_empty">Enter a name for the balance.</string>
+    <string name="error_amount_invalid">Enter a target amount greater than zero.</string>
+    <string name="error_renewal_date_missing">Select the renewal date.</string>
+    <string name="error_threshold_invalid">The threshold must be between 0 and 100.</string>
+    <string name="error_parent_not_found">The selected parent balance was not found.</string>
+    <string name="error_parent_exceeded">The sections exceed the available amount of the parent balance.</string>
+    <string name="error_cycle_not_allowed">That assignment would create a cycle in the hierarchy.</string>
+    <string name="error_balance_not_found">Balance not found.</string>
+    <string name="error_unknown">Could not save. Please try again.</string>
+
+    <string name="action_save">Save</string>
+    <string name="action_save_changes">Save changes</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_renew">Renew</string>
+    <string name="action_activate">Activate</string>
+    <string name="action_deactivate">Deactivate</string>
+    <string name="action_add_section">Add section</string>
+    <string name="action_back">Back</string>
+
+    <string name="periodicity_none">No renewal</string>
+    <string name="periodicity_daily">Daily</string>
+    <string name="periodicity_weekly">Weekly</string>
+    <string name="periodicity_biweekly">Biweekly</string>
+    <string name="periodicity_monthly">Monthly</string>
+    <string name="periodicity_yearly">Yearly</string>
+    <string name="periodicity_custom">Custom</string>
+    <string name="rollover_reset">Reset (back to 100%)</string>
+    <string name="rollover_accumulate">Accumulate (keeps leftover)</string>
+    <string name="rollover_transfer_savings">Transfer to savings</string>
+    <string name="rebalance_even">Even</string>
+    <string name="rebalance_front_loaded">Front-loaded</string>
+    <string name="rebalance_custom">Custom</string>
+    <string name="balance_type_regular">Regular</string>
+    <string name="balance_type_savings">Savings</string>
+
+    <string name="detail_title">Balance detail</string>
+    <string name="detail_available">AVAILABLE</string>
+    <string name="detail_inactive_suffix">Inactive</string>
+    <string name="detail_balance_not_found">Balance not found.</string>
+    <string name="detail_stat_total">Total</string>
+    <string name="detail_stat_free">Free</string>
+    <string name="detail_sections_title">Sections</string>
+    <string name="detail_info_general">General information</string>
+    <string name="detail_config">Configuration</string>
+    <string name="detail_dates">Dates and status</string>
+    <string name="detail_description">Description</string>
+    <string name="detail_type">Type</string>
+    <string name="detail_periodicity">Periodicity</string>
+    <string name="detail_rollover">On renewal</string>
+    <string name="detail_rebalance">Rebalance</string>
+    <string name="detail_overdraft">Overdraft</string>
+    <string name="detail_overdraft_allowed">Allowed</string>
+    <string name="detail_overdraft_denied">Not allowed</string>
+    <string name="detail_threshold">Notification threshold</string>
+    <string name="detail_next_renewal">Next renewal</string>
+    <string name="detail_created">Created</string>
+    <string name="detail_status">Status</string>
+    <string name="detail_status_active">Active</string>
+    <string name="detail_status_inactive">Inactive</string>
+    <string name="detail_confirm_deactivate_title">Deactivate balance</string>
+    <string name="detail_confirm_deactivate_message">Are you sure you want to deactivate "%1$s"? You can reactivate it anytime.</string>
+    <string name="detail_confirm_activate_title">Activate balance</string>
+    <string name="detail_confirm_activate_message">Do you want to activate "%1$s" again?</string>
+    <string name="detail_confirm_renew_title">Renew balance</string>
+    <string name="detail_confirm_renew_message">This will renew the cycle of "%1$s" according to its periodicity.</string>
+    <string name="dialog_discard_title">Discard changes</string>
+    <string name="dialog_discard_message">You have unsaved changes. Leave and discard them?</string>
+    <string name="action_discard">Leave</string>
+    <string name="action_keep_editing">Keep editing</string>
+</resources>

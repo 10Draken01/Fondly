@@ -9,6 +9,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import lat.virgotp.fondly.uicommon.R
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +44,7 @@ fun BalanceHeader(
         }
         if (onEditClick != null) {
             IconButton(onClick = onEditClick) {
-                Icon(Icons.Default.Edit, contentDescription = "Editar saldo", tint = hierarchyColor)
+                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit_balance), tint = hierarchyColor)
             }
         }
     }

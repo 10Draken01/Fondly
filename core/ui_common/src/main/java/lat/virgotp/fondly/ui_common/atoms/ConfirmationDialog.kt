@@ -8,7 +8,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import lat.virgotp.fondly.uicommon.R
 
 /**
  * Dialogo de confirmacion generico para acciones importantes o
@@ -23,8 +25,8 @@ fun ConfirmationDialog(
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    confirmLabel: String = "Confirmar",
-    dismissLabel: String = "Cancelar",
+    confirmLabel: String = stringResource(R.string.action_confirm),
+    dismissLabel: String = stringResource(R.string.action_cancel),
     confirmColor: Color = MaterialTheme.colorScheme.primary,
     icon: ImageVector? = null
 ) {

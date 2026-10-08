@@ -1,6 +1,6 @@
 package lat.virgotp.fondly.application.usecase
 
-import lat.virgotp.fondly.domain.model.Balance
+import lat.virgotp.fondly.domain.model.money
 import lat.virgotp.fondly.domain.port.BalanceRepository
 import javax.inject.Inject
 
@@ -13,21 +13,11 @@ class ResetBalanceByIdUseCase @Inject constructor(
                 IllegalArgumentException("Balance $parentId no encontrado")
             )
 
-            suspend fun recurse(balance: Balance) {
-                val resetBalance = balance.copy(
-                    available = balance.targetAmount
-                )
-
-                repository.update(resetBalance)
-
-                val children = repository.getChildrenOf(balance.id)
-
-                children.forEach { child ->
-                    recurse(child)
-                }
+            // Recorrido con guardia defensiva anti-ciclos (ver BalanceHierarchyGuard).
+            repository.update(parentBalance.copy(available = parentBalance.targetAmount.money()))
+            repository.collectDescendants(parentId).forEach { child ->
+                repository.update(child.copy(available = child.targetAmount.money()))
             }
-
-            recurse(parentBalance)
 
             Result.success(Unit)
         } catch (e: Exception) {

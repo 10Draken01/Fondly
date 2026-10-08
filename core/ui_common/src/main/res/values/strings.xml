@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Español (idioma base). RNF-010: todo texto visible de ui_common vive aquí. -->
+<resources>
+    <!-- Navegación -->
+    <string name="nav_balances">Saldos</string>
+    <string name="nav_sections">Apartados</string>
+    <string name="nav_settings">Configuración</string>
+
+    <!-- Compartidos -->
+    <string name="search_balances_hint">Buscar saldos</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_cancel">Cancelar</string>
+
+    <!-- Segmentos de barras de saldo -->
+    <string name="segment_free">Libre</string>
+    <string name="segment_used">Usado</string>
+    <string name="segment_empty">Vacío</string>
+
+    <!-- Montos -->
+    <string name="amount_of_total_connector">de</string>
+    <string name="balance_percent_free">%1$d%% libre</string>
+    <string name="app_brand">Fondly</string>
+    <string name="action_edit_balance">Editar saldo</string>
+    <string name="content_description_expand">Expandir</string>
+    <string name="content_description_collapse">Colapsar</string>
+</resources>

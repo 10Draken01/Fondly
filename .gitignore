@@ -12,3 +12,7 @@ local.properties
 /captures
 .externalNativeBuild
 .cxx
+.env
+opencode.jsonc
+# Copias compiladas obsoletas de fuentes (artefactos, no codigo de verdad)
+**/bin/

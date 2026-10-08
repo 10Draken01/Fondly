@@ -1,5 +1,7 @@
 package lat.virgotp.fondly.balances.detail.components
 
+import java.math.RoundingMode
+import java.math.BigDecimal
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +30,9 @@ import lat.virgotp.fondly.ui_common.molecules.SegmentedStatRow
 import lat.virgotp.fondly.ui_common.theme.BalanceHierarchyIcons
 import lat.virgotp.fondly.ui_common.theme.BalanceSegmentColors
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
+import androidx.compose.ui.res.stringResource
+import lat.virgotp.fondly.feature.balances.R
+import lat.virgotp.fondly.uicommon.R as UiCommonR
 import lat.virgotp.fondly.ui_common.util.buildBalanceCardSegments
 
 /**
@@ -42,17 +47,17 @@ import lat.virgotp.fondly.ui_common.util.buildBalanceCardSegments
 @Composable
 fun BalanceStatsSection(
     balance: Balance,
-    maxTarget: Double,
-    total: Double,
-    lockedDirect: Double,
+    maxTarget: BigDecimal,
+    total: BigDecimal,
+    lockedDirect: BigDecimal,
     hierarchyColor: Color,
     descendantsByParentId: Map<Long, List<Balance>>,
     modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
     val free = total - lockedDirect
-    val totalFraction = if (maxTarget > 0) (total / maxTarget).toFloat().coerceIn(0f, 1f) else 0f
-    val freeFraction = if (maxTarget > 0) (free / maxTarget).toFloat().coerceIn(0f, 1f) else 0f
+    val totalFraction = if (maxTarget.signum() > 0) total.divide(maxTarget, 6, RoundingMode.HALF_EVEN).toFloat().coerceIn(0f, 1f) else 0f
+    val freeFraction = if (maxTarget.signum() > 0) free.divide(maxTarget, 6, RoundingMode.HALF_EVEN).toFloat().coerceIn(0f, 1f) else 0f
     val emptyColor = scheme.surfaceVariant
 
     val descendants = remember(balance.id, descendantsByParentId) {
@@ -61,18 +66,18 @@ fun BalanceStatsSection(
 
     Column(modifier.fillMaxWidth()) {
         SegmentedStatRow(
-            label = "Total", amount = total, fraction = totalFraction,
+            label = stringResource(R.string.detail_stat_total), amount = total, fraction = totalFraction,
             color = hierarchyColor, emptyColor = emptyColor, icon = Icons.Filled.AccountBalanceWallet
         )
         Spacer(Modifier.height(FondlySpacing.lg))
         SegmentedStatRow(
-            label = "Libre", amount = free, fraction = freeFraction,
+            label = stringResource(R.string.detail_stat_free), amount = free, fraction = freeFraction,
             color = scheme.primary, emptyColor = emptyColor, icon = Icons.Filled.LockOpen
         )
 
         if (descendants.isNotEmpty()) {
             Spacer(Modifier.height(FondlySpacing.xl))
-            Text("Apartados", style = MaterialTheme.typography.titleSmall, color = scheme.onSurfaceVariant)
+            Text(stringResource(R.string.detail_sections_title), style = MaterialTheme.typography.titleSmall, color = scheme.onSurfaceVariant)
             Spacer(Modifier.height(FondlySpacing.sm))
             descendants.forEach { (level, node) ->
                 DescendantStatBlock(
@@ -109,7 +114,7 @@ private fun DescendantStatBlock(
     val scheme = MaterialTheme.colorScheme
     val accentColor = BalanceSegmentColors.forLevel(level)
     val target = node.targetAmount
-    val freeFraction = if (target > 0) (node.available / target).toFloat().coerceIn(0f, 1f) else 0f
+    val freeFraction = if (target.signum() > 0) node.available.divide(target, 6, RoundingMode.HALF_EVEN).toFloat().coerceIn(0f, 1f) else 0f
 
     // Colores resueltos aqui (contexto @Composable) antes de pasarlos
     // como lambda comun a buildBalanceCardSegments (funcion no-composable).
@@ -123,6 +128,8 @@ private fun DescendantStatBlock(
         childrenByParentId = childrenByParentId,
         freeColor = scheme.primary,
         usedColor = scheme.outline,
+        freeLabel = stringResource(UiCommonR.string.segment_free),
+        usedLabel = stringResource(UiCommonR.string.segment_used),
         colorForLevel = colorForLevel
     )
     val legendItems = segments.map { LegendItem(it.label, it.color) }

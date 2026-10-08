@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_balances">Balances</string>
+    <string name="nav_sections">Sections</string>
+    <string name="nav_settings">Settings</string>
+
+    <string name="search_balances_hint">Search balances</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_cancel">Cancel</string>
+
+    <string name="segment_free">Free</string>
+    <string name="segment_used">Used</string>
+    <string name="segment_empty">Empty</string>
+
+    <string name="amount_of_total_connector">of</string>
+    <string name="balance_percent_free">%1$d%% free</string>
+    <string name="app_brand">Fondly</string>
+    <string name="action_edit_balance">Edit balance</string>
+    <string name="content_description_expand">Expand</string>
+    <string name="content_description_collapse">Collapse</string>
+</resources>

@@ -1,4 +1,4 @@
-package lat.virgotp.fondly.sections
+package lat.virgotp.fondly.balance_sections
 
 import lat.virgotp.fondly.domain.model.Balance
 

@@ -22,7 +22,7 @@ Dar a una persona control claro y sencillo sobre su dinero: cuánto tiene dispon
 
 ## Estado del proyecto
 
-🚧 En desarrollo temprano — definiendo arquitectura y modelo de dominio antes de comenzar la implementación (ver [`docs/`](./docs)).
+🚧 En desarrollo — Sprint 1 (gestión de saldos) implementado sobre arquitectura multi-módulo y base de datos Room v2 (ver [`docs/`](./docs) y ADR-0001 a ADR-0004).
 
 ## Stack tecnológico
 
@@ -30,7 +30,7 @@ Dar a una persona control claro y sencillo sobre su dinero: cuánto tiene dispon
 - **UI**: Jetpack Compose
 - **Build**: Gradle con Kotlin DSL (`build.gradle.kts`)
 - **Arquitectura**: Clean Architecture (simplificada) + MVVM — ver [`docs/architecture/architecture.md`](./docs/architecture/architecture.md)
-- **Persistencia local**: Room (a confirmar en `docs/architecture/database.md`)
+- **Persistencia local**: Room (migraciones explícitas, esquema versionado — `docs/architecture/database.md`)
 - Detalles completos y justificación de cada elección en [`docs/architecture/decisions.md`](./docs/architecture/decisions.md)
 
 ## Convenciones del proyecto
@@ -75,18 +75,27 @@ Abre la carpeta en Android Studio, espera el sync de Gradle, y ejecuta con ▶�
 ## Estructura del proyecto
 
 ```
-app/src/main/java/lat/virgotp/fondly/
-├── ui/            (pantallas y componentes de Jetpack Compose)
-├── data/          (fuentes de datos locales y repositorios)
-├── domain/        (modelos y casos de uso)
-└── di/            (inyección de dependencias)
+app/                   (composition root: Application, MainActivity)
+core/
+├── domain/            (JVM puro: modelos, ports, excepciones — sin Android/Room)
+├── application/       (JVM puro: casos de uso)
+├── infrastructure/    (Android: Room, mappers, repositorios, DI Hilt)
+└── ui_common/         (design system Compose compartido, rutas)
+feature/
+├── balances/          (dashboard, crear, editar, detalle)
+├── balance_sections/  (apartados)
+├── home/              (shell de navegación, splash)
+├── settings/          (tema e idioma)
+├── transactions/      (Sprint 2)
+└── recurring/         (Sprint 3)
 ```
+Reglas de dependencia: ver ADR-0002.
 
 ## Roadmap
 
 - [x] Fase 1 — Preparación del entorno
-- [ ] Fase 2 — Requerimientos, modelo de dominio, arquitectura, base de datos, casos de uso
-- [ ] Fase 3 — Metodología Scrum (épicas, historias de usuario, backlog, sprints)
+- [x] Fase 2 — Requerimientos, modelo de dominio, arquitectura, base de datos, casos de uso
+- [x] Fase 3 — Metodología Scrum (épicas, historias de usuario, backlog, sprints)
 - [ ] Fase 4 — Implementación incremental por sprint
 
 ## Metodología

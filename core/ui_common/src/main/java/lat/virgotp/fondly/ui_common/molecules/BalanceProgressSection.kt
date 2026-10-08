@@ -1,5 +1,6 @@
 package lat.virgotp.fondly.ui_common.molecules
 
+import java.math.BigDecimal
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import lat.virgotp.fondly.ui_common.atoms.AmountOfTotalText
 import lat.virgotp.fondly.ui_common.atoms.BarSegment
 import lat.virgotp.fondly.ui_common.atoms.DistributedSegmentedBar
+import androidx.compose.ui.res.stringResource
+import lat.virgotp.fondly.uicommon.R
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
 import kotlin.math.roundToInt
 
@@ -25,8 +28,8 @@ import kotlin.math.roundToInt
 fun BalanceProgressSection(
     segments: List<BarSegment>,
     legendItems: List<LegendItem>,
-    available: Double,
-    target: Double,
+    available: BigDecimal,
+    target: BigDecimal,
     freeFraction: Float,
     freeColor: Color,
     modifier: Modifier = Modifier
@@ -45,7 +48,7 @@ fun BalanceProgressSection(
         ) {
             AmountOfTotalText(current = available, total = target)
             Text(
-                "${(freeFraction * 100).roundToInt()}% libre",
+                stringResource(R.string.balance_percent_free, (freeFraction * 100).roundToInt()),
                 style = MaterialTheme.typography.labelLarge,
                 color = freeColor
             )

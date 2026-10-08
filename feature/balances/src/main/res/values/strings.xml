@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Español (idioma base). RNF-010. -->
+<resources>
+    <!-- Dashboard -->
+    <string name="dashboard_title">Saldos</string>
+    <string name="dashboard_total_available">DISPONIBLE TOTAL</string>
+    <string name="dashboard_empty_title">Aún no tienes saldos</string>
+    <string name="dashboard_empty_subtitle">Crea tu primer saldo con el botón dorado.</string>
+    <string name="action_create_balance">Crear saldo</string>
+
+    <!-- Filtros -->
+    <string name="filter_active">Activos</string>
+    <string name="filter_inactive">Inactivos</string>
+    <string name="filter_all">Todos</string>
+
+    <!-- Formulario -->
+    <string name="create_balance_title">Crear saldo</string>
+    <string name="create_section_title">Nuevo apartado</string>
+    <string name="create_balance_subtitle">Define tu saldo inicial para empezar a organizar tu dinero.</string>
+    <string name="create_section_subtitle">Define el monto que apartarás de tu saldo padre.</string>
+    <string name="edit_balance_title">Editar saldo</string>
+    <string name="section_general">Información general</string>
+    <string name="section_renewal">Renovación</string>
+    <string name="section_options">Opciones</string>
+
+    <string name="field_name">Nombre</string>
+    <string name="field_name_placeholder">Ej. Gastos semanales</string>
+    <string name="field_target_amount">Monto objetivo</string>
+    <string name="field_target_amount_placeholder">0.00</string>
+    <string name="field_description">Descripción (opcional)</string>
+    <string name="field_description_placeholder">Notas sobre este saldo</string>
+    <string name="field_type">Tipo de saldo</string>
+    <string name="field_periodicity">Periodicidad de renovación</string>
+    <string name="field_renewal_date">Fecha de renovación</string>
+    <string name="field_rollover">Al renovar (sobrante)</string>
+    <string name="field_rebalance">Estrategia de reajuste</string>
+    <string name="field_overdraft">Permitir sobregiro</string>
+    <string name="field_overdraft_hint">Permite que el disponible quede en negativo por gastos.</string>
+    <string name="field_threshold">Umbral de notificación % (opcional)</string>
+    <string name="field_reset_to_target">Ajustar saldo al límite</string>
+    <string name="field_reset_to_target_hint">Restablece el disponible de este saldo y sus apartados al monto objetivo.</string>
+    <string name="field_balance_active">Saldo activo</string>
+    <string name="field_balance_inactive">Saldo inactivo</string>
+
+    <!-- Errores de formulario -->
+    <string name="error_name_empty">Escribe un nombre para el saldo.</string>
+    <string name="error_amount_invalid">Ingresa un monto objetivo mayor que cero.</string>
+    <string name="error_renewal_date_missing">Selecciona la fecha de renovación.</string>
+    <string name="error_threshold_invalid">El umbral debe estar entre 0 y 100.</string>
+    <string name="error_parent_not_found">No se encontró el saldo padre seleccionado.</string>
+    <string name="error_parent_exceeded">La suma de los apartados excede el disponible del saldo padre.</string>
+    <string name="error_cycle_not_allowed">Esa asignación crearía un ciclo en la jerarquía.</string>
+    <string name="error_balance_not_found">No se encontró el saldo.</string>
+    <string name="error_unknown">No se pudo guardar. Inténtalo de nuevo.</string>
+
+    <!-- Acciones -->
+    <string name="action_save">Guardar</string>
+    <string name="action_save_changes">Guardar cambios</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_renew">Renovar</string>
+    <string name="action_activate">Activar</string>
+    <string name="action_deactivate">Desactivar</string>
+    <string name="action_add_section">Agregar apartado</string>
+    <string name="action_back">Volver</string>
+
+    <!-- Enums de dominio -->
+    <string name="periodicity_none">Sin renovación</string>
+    <string name="periodicity_daily">Diaria</string>
+    <string name="periodicity_weekly">Semanal</string>
+    <string name="periodicity_biweekly">Quincenal</string>
+    <string name="periodicity_monthly">Mensual</string>
+    <string name="periodicity_yearly">Anual</string>
+    <string name="periodicity_custom">Personalizada</string>
+    <string name="rollover_reset">Restablecer (vuelve a 100%)</string>
+    <string name="rollover_accumulate">Acumular (conserva sobrante)</string>
+    <string name="rollover_transfer_savings">Transferir a ahorro</string>
+    <string name="rebalance_even">Uniforme</string>
+    <string name="rebalance_front_loaded">Anticipado</string>
+    <string name="rebalance_custom">Personalizado</string>
+    <string name="balance_type_regular">Regular</string>
+    <string name="balance_type_savings">Ahorro</string>
+
+    <!-- Detalle -->
+    <string name="detail_title">Detalle del saldo</string>
+    <string name="detail_available">DISPONIBLE</string>
+    <string name="detail_inactive_suffix">Inactivo</string>
+    <string name="detail_balance_not_found">No se encontró el saldo.</string>
+    <string name="detail_stat_total">Total</string>
+    <string name="detail_stat_free">Libre</string>
+    <string name="detail_sections_title">Apartados</string>
+    <string name="detail_info_general">Información general</string>
+    <string name="detail_config">Configuración</string>
+    <string name="detail_dates">Fechas y estado</string>
+    <string name="detail_description">Descripción</string>
+    <string name="detail_type">Tipo</string>
+    <string name="detail_periodicity">Periodicidad</string>
+    <string name="detail_rollover">Al renovar</string>
+    <string name="detail_rebalance">Reajuste</string>
+    <string name="detail_overdraft">Sobregiro</string>
+    <string name="detail_overdraft_allowed">Permitido</string>
+    <string name="detail_overdraft_denied">No permitido</string>
+    <string name="detail_threshold">Umbral de notificación</string>
+    <string name="detail_next_renewal">Próxima renovación</string>
+    <string name="detail_created">Creado</string>
+    <string name="detail_status">Estado</string>
+    <string name="detail_status_active">Activo</string>
+    <string name="detail_status_inactive">Inactivo</string>
+    <string name="detail_confirm_deactivate_title">Desactivar saldo</string>
+    <string name="detail_confirm_deactivate_message">¿Seguro que quieres desactivar "%1$s"? Podrás reactivarlo cuando quieras.</string>
+    <string name="detail_confirm_activate_title">Activar saldo</string>
+    <string name="detail_confirm_activate_message">¿Deseas volver a activar "%1$s"?</string>
+    <string name="detail_confirm_renew_title">Renovar saldo</string>
+    <string name="detail_confirm_renew_message">Esto renovará el ciclo de "%1$s" según su periodicidad.</string>
+    <string name="dialog_discard_title">Descartar cambios</string>
+    <string name="dialog_discard_message">Tienes cambios sin guardar. ¿Quieres salir y descartarlos?</string>
+    <string name="action_discard">Salir</string>
+    <string name="action_keep_editing">Seguir editando</string>
+</resources>

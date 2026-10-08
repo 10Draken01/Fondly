@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sections_title">Sections</string>
+    <string name="sections_parent_filter">Parent balance</string>
+    <string name="sections_all_parents">All balances</string>
+    <string name="sections_empty">No sections match this filter.</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_inactive">Inactive</string>
+    <string name="filter_all">All</string>
+</resources>

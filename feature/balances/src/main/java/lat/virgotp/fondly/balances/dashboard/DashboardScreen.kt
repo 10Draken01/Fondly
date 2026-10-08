@@ -17,7 +17,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import lat.virgotp.fondly.feature.balances.R
 import kotlinx.coroutines.delay
 import lat.virgotp.fondly.balances.dashboard.components.BalanceFilterBar
 import lat.virgotp.fondly.ui_common.atoms.FondlyButton
@@ -26,6 +28,7 @@ import lat.virgotp.fondly.ui_common.organisms.BalanceCard
 import lat.virgotp.fondly.ui_common.templates.FondlyScreenScaffold
 import lat.virgotp.fondly.ui_common.theme.Motion
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
+import lat.virgotp.fondly.ui_common.theme.FondlyCurrencyController
 import lat.virgotp.fondly.ui_common.util.FondlyMoney
 
 /** Sección [Saldos]: solo saldos base, FAB exclusivo de creación (RF-032/033). */
@@ -38,16 +41,17 @@ fun DashboardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scheme = MaterialTheme.colorScheme
+    val currency = FondlyCurrencyController.rememberCurrency()
 
     FondlyScreenScaffold(
-        title = "Saldos",
+        title = stringResource(R.string.dashboard_title),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreateBalanceClick,
                 containerColor = scheme.primary,
                 contentColor = scheme.onPrimary,
                 shape = CircleShape
-            ) { Icon(Icons.Default.Add, contentDescription = "Crear saldo") }
+            ) { Icon(Icons.Default.Add, contentDescription = stringResource(R.string.action_create_balance)) }
         },
     ) { paddingValues ->
         LazyColumn(
@@ -58,8 +62,8 @@ fun DashboardScreen(
 
             item(key = "header") {
                 Column(Modifier.padding(vertical = FondlySpacing.md)) {
-                    Text("DISPONIBLE TOTAL", style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant)
-                    Text(FondlyMoney.formatMXN(total), style = MaterialTheme.typography.headlineLarge, color = scheme.primary)
+                    Text(stringResource(R.string.dashboard_total_available), style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant)
+                    Text(FondlyMoney.format(total, currency), style = MaterialTheme.typography.headlineLarge, color = scheme.primary)
                 }
             }
 
@@ -118,15 +122,21 @@ private fun EmptySaldosState(onCreateBalanceClick: () -> Unit) {
         Box(
             Modifier.size(72.dp).clip(CircleShape).background(scheme.primary.copy(alpha = 0.12f)),
             contentAlignment = Alignment.Center
-        ) { Text("$", style = MaterialTheme.typography.displaySmall, color = scheme.primary) }
-        Text("Aún no tienes saldos", style = MaterialTheme.typography.titleLarge, color = scheme.onSurface, modifier = Modifier.padding(top = FondlySpacing.md))
+        ) {
+                Text(
+                    FondlyCurrencyController.rememberCurrency().symbol,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = scheme.primary
+                )
+            }
+        Text(stringResource(R.string.dashboard_empty_title), style = MaterialTheme.typography.titleLarge, color = scheme.onSurface, modifier = Modifier.padding(top = FondlySpacing.md))
         Text(
-            "Crea tu primer saldo con el botón dorado.",
+            stringResource(R.string.dashboard_empty_subtitle),
             style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant,
             textAlign = TextAlign.Center, modifier = Modifier.padding(top = FondlySpacing.sm)
         )
         FondlyButton(
-            text = "Crear saldo", onClick = onCreateBalanceClick, variant = FondlyButtonVariant.Secondary,
+            text = stringResource(R.string.action_create_balance), onClick = onCreateBalanceClick, variant = FondlyButtonVariant.Secondary,
             modifier = Modifier.padding(top = FondlySpacing.lg).fillMaxWidth(0.7f)
         )
     }

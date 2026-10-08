@@ -13,12 +13,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import lat.virgotp.fondly.sections.BalanceSectionsScreen
+import lat.virgotp.fondly.balance_sections.BalanceSectionsScreen
 import lat.virgotp.fondly.balances.createbalance.CreateBalanceScreen
 import lat.virgotp.fondly.balances.dashboard.DashboardScreen
 import lat.virgotp.fondly.balances.detail.BalanceDetailScreen
 import lat.virgotp.fondly.balances.editbalance.EditBalanceScreen
 import lat.virgotp.fondly.settings.SettingsScreen
+import lat.virgotp.fondly.ui_common.navigation.FondlyRoutes
 import lat.virgotp.fondly.ui_common.templates.FondlyBottomNavigation
 import lat.virgotp.fondly.ui_common.templates.FondlySection
 import lat.virgotp.fondly.ui_common.templates.FondlySplashScreen
@@ -26,16 +27,17 @@ import lat.virgotp.fondly.ui_common.templates.FondlySplashScreen
 @Composable
 fun FondlyApp() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "splash") {
-        composable("splash") {
-            val splashViewModel: SplashViewModel = hiltViewModel()
+    NavHost(navController = navController, startDestination = FondlyRoutes.SPLASH) {
+        composable(FondlyRoutes.SPLASH) {
+            // Instanciarlo dispara ProcessBalanceRenewalsUseCase durante el splash.
+            hiltViewModel<SplashViewModel>()
             FondlySplashScreen(onFinished = {
-                navController.navigate("main") {
-                    popUpTo("splash") { inclusive = true }
+                navController.navigate(FondlyRoutes.MAIN) {
+                    popUpTo(FondlyRoutes.SPLASH) { inclusive = true }
                 }
             })
         }
-        composable("main") { FondlyMainScreen() }
+        composable(FondlyRoutes.MAIN) { FondlyMainScreen() }
     }
 }
 
@@ -53,7 +55,7 @@ fun FondlyMainScreen() {
                 currentRoute = currentRoute,
                 onNavigate = { route ->
                     navController.navigate(route) {
-                        popUpTo(FondlySection.BALANCES.route) {
+                        popUpTo(FondlyRoutes.BALANCES) {
                             saveState = true
                         }
                         launchSingleTop = true
@@ -78,53 +80,59 @@ fun FondlyMainScreen() {
                     )
                 }
         ) {
-            NavHost(navController = navController, startDestination = FondlySection.BALANCES.route) {
-                composable("balances") {
+            NavHost(navController = navController, startDestination = FondlyRoutes.BALANCES) {
+                composable(FondlyRoutes.BALANCES) {
                     DashboardScreen(
-                        onCreateBalanceClick = { navController.navigate("create") },
-                        onBalanceClick = { id -> navController.navigate("detail/$id") },
-                        onEditClick = { id -> navController.navigate("edit/$id") }
+                        onCreateBalanceClick = { navController.navigate(FondlyRoutes.create()) },
+                        onBalanceClick = { id -> navController.navigate(FondlyRoutes.detail(id)) },
+                        onEditClick = { id -> navController.navigate(FondlyRoutes.edit(id)) }
                     )
                 }
-                composable("balance_sections") {
+                composable(FondlyRoutes.BALANCE_SECTIONS) {
                     BalanceSectionsScreen(
-                        onBalanceClick = { id -> navController.navigate("detail/$id") },
-                        onEditClick = { id -> navController.navigate("edit/$id") }
+                        onBalanceClick = { id -> navController.navigate(FondlyRoutes.detail(id)) },
+                        onEditClick = { id -> navController.navigate(FondlyRoutes.edit(id)) }
                     )
                 }
-                composable("settings") { SettingsScreen() }
+                composable(FondlyRoutes.SETTINGS) { SettingsScreen() }
 
                 composable(
-                    route = "detail/{balanceId}",
-                    arguments = listOf(navArgument("balanceId") { type = NavType.LongType })
+                    route = FondlyRoutes.DETAIL_PATTERN,
+                    arguments = listOf(navArgument(FondlyRoutes.ARG_BALANCE_ID) { type = NavType.LongType })
                 ) { entry ->
-                    val id = entry.arguments?.getLong("balanceId") ?: return@composable
+                    val id = entry.arguments?.getLong(FondlyRoutes.ARG_BALANCE_ID) ?: return@composable
                     BalanceDetailScreen(
                         balanceId = id,
-                        onEditClick = { navController.navigate("edit/$id") },
-                        onAddChildClick = { navController.navigate("create?parentId=$id") },
+                        onEditClick = { navController.navigate(FondlyRoutes.edit(id)) },
+                        onAddChildClick = { navController.navigate(FondlyRoutes.create(parentId = id)) },
                         onBack = { navController.popBackStack() }
                     )
                 }
                 composable(
-                    route = "create?parentId={parentId}",
+                    route = FondlyRoutes.CREATE_PATTERN,
                     arguments = listOf(
-                        navArgument("parentId") { type = NavType.LongType; defaultValue = -1L }
+                        navArgument(FondlyRoutes.ARG_PARENT_ID) {
+                            type = NavType.LongType
+                            defaultValue = FondlyRoutes.NO_PARENT
+                        }
                     )
                 ) { entry ->
                     CreateBalanceScreen(
-                        parentBalanceId = entry.arguments?.getLong("parentId")?.takeIf { it != -1L },
-                        onSaved = { navController.popBackStack() }
+                        parentBalanceId = entry.arguments?.getLong(FondlyRoutes.ARG_PARENT_ID)
+                            ?.takeIf { it != FondlyRoutes.NO_PARENT },
+                        onSaved = { navController.popBackStack() },
+                        onBack = { navController.popBackStack() }
                     )
                 }
                 composable(
-                    route = "edit/{balanceId}",
-                    arguments = listOf(navArgument("balanceId") { type = NavType.LongType })
+                    route = FondlyRoutes.EDIT_PATTERN,
+                    arguments = listOf(navArgument(FondlyRoutes.ARG_BALANCE_ID) { type = NavType.LongType })
                 ) { entry ->
-                    val id = entry.arguments?.getLong("balanceId") ?: return@composable
+                    val id = entry.arguments?.getLong(FondlyRoutes.ARG_BALANCE_ID) ?: return@composable
                     EditBalanceScreen(
                         balanceId = id,
-                        onSaved = { navController.popBackStack() }
+                        onSaved = { navController.popBackStack() },
+                        onBack = { navController.popBackStack() }
                     )
                 }
             }

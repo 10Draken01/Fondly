@@ -1,5 +1,6 @@
 package lat.virgotp.fondly.ui_common.molecules
 
+import java.math.BigDecimal
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +25,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import lat.virgotp.fondly.ui_common.atoms.BarSegment
 import lat.virgotp.fondly.ui_common.atoms.DistributedSegmentedBar
+import androidx.compose.ui.res.stringResource
+import lat.virgotp.fondly.uicommon.R
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
+import lat.virgotp.fondly.ui_common.theme.FondlyCurrencyController
 import lat.virgotp.fondly.ui_common.util.FondlyMoney
 import kotlin.math.roundToInt
 
@@ -38,7 +42,7 @@ import kotlin.math.roundToInt
 @Composable
 fun SegmentedStatRow(
     label: String,
-    amount: Double,
+    amount: BigDecimal,
     fraction: Float,
     color: Color,
     emptyColor: Color,
@@ -46,10 +50,11 @@ fun SegmentedStatRow(
     icon: ImageVector? = null
 ) {
     val scheme = MaterialTheme.colorScheme
+    val currency = FondlyCurrencyController.rememberCurrency()
     val clamped = fraction.coerceIn(0f, 1f)
     val segments = listOf(
         BarSegment(clamped, color, label),
-        BarSegment(1f - clamped, emptyColor, "Vacío")
+        BarSegment(1f - clamped, emptyColor, stringResource(R.string.segment_empty))
     ).filter { it.fraction > 0f }
     val legendItems = segments.map { LegendItem(it.label, it.color) }
 
@@ -65,7 +70,7 @@ fun SegmentedStatRow(
                 Text(label, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurface)
             }
             Text(
-                "${FondlyMoney.formatMXN(amount)} · ${(clamped * 100).roundToInt()}%",
+                "${FondlyMoney.format(amount, currency)} · ${(clamped * 100).roundToInt()}%",
                 style = MaterialTheme.typography.labelLarge,
                 color = scheme.onSurfaceVariant
             )

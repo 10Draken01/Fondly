@@ -10,7 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import lat.virgotp.fondly.balances.dashboard.BalanceStatusFilter
+import lat.virgotp.fondly.feature.balances.R
 import lat.virgotp.fondly.ui_common.atoms.FondlySearchField
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
 
@@ -37,9 +39,9 @@ fun BalanceFilterBar(
                     label = {
                         Text(
                             when (filter) {
-                                BalanceStatusFilter.ACTIVE -> "Activos"
-                                BalanceStatusFilter.INACTIVE -> "Inactivos"
-                                BalanceStatusFilter.ALL -> "Todos"
+                                BalanceStatusFilter.ACTIVE -> stringResource(R.string.filter_active)
+                                BalanceStatusFilter.INACTIVE -> stringResource(R.string.filter_inactive)
+                                BalanceStatusFilter.ALL -> stringResource(R.string.filter_all)
                             }
                         )
                     },

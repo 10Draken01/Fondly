@@ -22,8 +22,8 @@ Representa un saldo, presupuesto o apartado de dinero.
 |---|---|---|
 | `id` | `Long` (PK) | Identificador único. |
 | `name` | `String` | Nombre visible (ingresado por el usuario, en el idioma que él elija — es dato, no recurso de string). |
-| `targetAmount` | `BigDecimal` | Monto objetivo o límite. |
-| `available` | `BigDecimal` | Caché del disponible actual (ver ADR-0001, punto 9). |
+| `targetAmount` | `BigDecimal` (escala 2, HALF_EVEN — ADR-0003) | Monto objetivo o límite. |
+| `available` | `BigDecimal` | Caché materializado del disponible actual; reconstruible desde el ledger (INV-1, ver ADR-0001 punto 9 y ADR-0003). |
 | `periodicity` | `Periodicity?` enum (`DAILY, WEEKLY, BIWEEKLY, MONTHLY, YEARLY, CUSTOM, NONE`) | Periodicidad de renovación; `NONE` si no aplica. |
 | `renewalDate` | `LocalDate?` | Próxima fecha de renovación (calculada). |
 | `parentBalanceId` | `Long?` (FK → `Balance.id`) | Saldo padre, si aplica. |
@@ -53,8 +53,8 @@ Representa un ingreso o gasto real, ya ejecutado.
 | `id` | `Long` (PK) | Identificador único. |
 | `balanceId` | `Long` (FK → `Balance.id`) | Saldo destino/origen explícito. |
 | `type` | `TransactionType` enum (`INCOME, EXPENSE, ALLOCATION, ADJUSTMENT`) | Naturaleza de la transacción. `ALLOCATION` para transferencias internas padre→hijo (ADR-0001 punto 4); `ADJUSTMENT` para correcciones (BR-007). |
-| `amount` | `BigDecimal` | Monto (siempre positivo; el signo del efecto lo determina `type`). |
-| `quantity` | `Int` | Cantidad de unidades (relevante para gastos de producto, ej. "2 cafés"). Default `1`. |
+| `amount` | `BigDecimal` | Precio **unitario** (siempre > 0; el signo del efecto lo determina `type`). Importe efectivo = `amount × quantity`. |
+| `quantity` | `Int` | Cantidad de unidades (> 0). Default `1`. |
 | `name` | `String` | Nombre/concepto (ej. "Café", "Regalo de mi tío"). |
 | `category` | `String?` | Categoría simple opcional (ver nota de consolidación arriba). |
 | `description` | `String?` | Descripción opcional. |
@@ -66,7 +66,9 @@ Representa un ingreso o gasto real, ya ejecutado.
 
 **Reglas de negocio aplicables**: BR-004, BR-005, BR-006, BR-007, BR-008.
 
-**Inmutabilidad**: nunca se actualiza ni se borra tras su creación (BR-007); correcciones vía nuevas transacciones `ADJUSTMENT`.
+**Inmutabilidad**: nunca se actualiza ni se borra tras su creación (BR-007); correcciones vía nuevas transacciones `ADJUSTMENT`. Las **renovaciones** de saldos también se representan como transacciones `ADJUSTMENT` **de sistema** (ADR-0003, decisión D2): distinguibles por `type` + convención de `name`/`description`, sin ninguna entidad adicional, de modo que el ledger reconstruye `available` por agregación pura.
+
+**Manejo monetario (ADR-0003)**: todo dinero en dominio es `BigDecimal` escala 2 / `HALF_EVEN`; comparaciones con `compareTo()`, nunca `equals()`; prohibido `Double`/`Float`. Persistencia en SQLite: `INTEGER` centavos; conversión solo en mappers de infrastructure. Moneda única del MVP: **MXN**.
 
 ---
 

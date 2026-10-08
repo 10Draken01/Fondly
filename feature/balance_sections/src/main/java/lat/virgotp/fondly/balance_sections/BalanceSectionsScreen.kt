@@ -1,4 +1,4 @@
-package lat.virgotp.fondly.sections
+package lat.virgotp.fondly.balance_sections
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,7 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.ui.res.stringResource
 import lat.virgotp.fondly.balance_sections.components.atoms.ParentFilterDropdown
+import lat.virgotp.fondly.feature.sections.R
 import lat.virgotp.fondly.ui_common.atoms.FondlySearchField
 import lat.virgotp.fondly.ui_common.organisms.BalanceCard
 import lat.virgotp.fondly.ui_common.templates.FondlyScreenScaffold
@@ -25,7 +27,7 @@ fun BalanceSectionsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val scheme = MaterialTheme.colorScheme
 
-    FondlyScreenScaffold(title = "Sections") { paddingValues ->
+    FondlyScreenScaffold(title = stringResource(R.string.sections_title)) { paddingValues ->
         LazyColumn(
             Modifier.fillMaxSize().padding(paddingValues),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = FondlySpacing.sm, bottom = 40.dp)
@@ -50,9 +52,9 @@ fun BalanceSectionsScreen(
                                 onClick = { viewModel.onStatusFilterChange(filter) },
                                 label = {
                                     Text(when (filter) {
-                                        BalanceSectionsStatusFilter.ACTIVE -> "Activos"
-                                        BalanceSectionsStatusFilter.INACTIVE -> "Inactivos"
-                                        BalanceSectionsStatusFilter.ALL -> "Todos"
+                                        BalanceSectionsStatusFilter.ACTIVE -> stringResource(R.string.filter_active)
+                                        BalanceSectionsStatusFilter.INACTIVE -> stringResource(R.string.filter_inactive)
+                                        BalanceSectionsStatusFilter.ALL -> stringResource(R.string.filter_all)
                                     })
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
@@ -74,7 +76,7 @@ fun BalanceSectionsScreen(
                 uiState.sections.isEmpty() -> item(key = "empty") {
                     Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            "No hay Sections para este filtro.",
+                            stringResource(R.string.sections_empty),
                             style = MaterialTheme.typography.bodyMedium,
                             color = scheme.onSurfaceVariant
                         )

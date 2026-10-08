@@ -1,5 +1,6 @@
 package lat.virgotp.fondly.ui_common.molecules
 
+import java.math.BigDecimal
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import lat.virgotp.fondly.ui_common.atoms.FondlyProgressBar
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
+import lat.virgotp.fondly.ui_common.theme.FondlyCurrencyController
 import lat.virgotp.fondly.ui_common.util.FondlyMoney
 import kotlin.math.roundToInt
 
@@ -37,7 +39,7 @@ import kotlin.math.roundToInt
 @Composable
 fun LabeledProgressStat(
     label: String,
-    amount: Double,
+    amount: BigDecimal,
     fraction: Float,
     color: Color,
     modifier: Modifier = Modifier,
@@ -46,6 +48,7 @@ fun LabeledProgressStat(
     barHeight: androidx.compose.ui.unit.Dp = 10.dp
 ) {
     val scheme = MaterialTheme.colorScheme
+    val currency = FondlyCurrencyController.rememberCurrency()
     Column(
         modifier
             .fillMaxWidth()
@@ -68,7 +71,7 @@ fun LabeledProgressStat(
                 )
             }
             Text(
-                "${FondlyMoney.formatMXN(amount)} · ${(fraction * 100).roundToInt()}%",
+                "${FondlyMoney.format(amount, currency)} · ${(fraction * 100).roundToInt()}%",
                 style = MaterialTheme.typography.labelLarge,
                 color = scheme.onSurfaceVariant
             )

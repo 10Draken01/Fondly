@@ -1,4 +1,4 @@
-package lat.virgotp.fondly.sections
+package lat.virgotp.fondly.balance_sections
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

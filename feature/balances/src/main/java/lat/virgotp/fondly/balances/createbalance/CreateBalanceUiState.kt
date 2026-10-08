@@ -1,7 +1,11 @@
 package lat.virgotp.fondly.balances.createbalance
 
 import kotlinx.datetime.LocalDate
-import lat.virgotp.fondly.domain.model.*
+import lat.virgotp.fondly.balances.form.BalanceFormError
+import lat.virgotp.fondly.domain.model.BalanceType
+import lat.virgotp.fondly.domain.model.Periodicity
+import lat.virgotp.fondly.domain.model.RebalanceStrategy
+import lat.virgotp.fondly.domain.model.RolloverStrategy
 
 data class CreateBalanceUiState(
     val name: String = "",
@@ -15,6 +19,6 @@ data class CreateBalanceUiState(
     val allowOverdraft: Boolean = false,
     val notificationThreshold: String = "",
     val isSaving: Boolean = false,
-    val errorMessage: String? = null,
+    val error: BalanceFormError? = null,
     val savedSuccessfully: Boolean = false
 )

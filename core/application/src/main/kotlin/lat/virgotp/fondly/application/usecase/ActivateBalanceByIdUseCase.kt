@@ -8,9 +8,8 @@ class ActivateBalanceByIdUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(id: Long): Result<Unit> {
         return try {
-            val childrens = repository.getDeactiveChildrenOf(id) // esto incluye al padre
-            // si no tiene hijos no pasa nada
-            for( c in childrens ){
+            val children = repository.getDeactiveChildrenOf(id) // hijos DIRECTOS inactivos
+            for (c in children) {
                 repository.activate(c.id)
             }
             repository.activate(id)

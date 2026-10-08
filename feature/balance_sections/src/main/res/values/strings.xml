@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Español (idioma base). RNF-010. -->
+<resources>
+    <string name="sections_title">Apartados</string>
+    <string name="sections_parent_filter">Saldo padre</string>
+    <string name="sections_all_parents">Todos los saldos</string>
+    <string name="sections_empty">No hay apartados para este filtro.</string>
+    <string name="filter_active">Activos</string>
+    <string name="filter_inactive">Inactivos</string>
+    <string name="filter_all">Todos</string>
+</resources>

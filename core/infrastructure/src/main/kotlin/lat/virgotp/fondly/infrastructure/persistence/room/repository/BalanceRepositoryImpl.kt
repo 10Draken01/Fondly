@@ -27,7 +27,7 @@ class BalanceRepositoryImpl @Inject constructor(
         dao.getById(id)?.toDomain()
 
     override suspend fun getDeactiveChildrenOf(parentId: Long): List<Balance> =
-        dao.getActiveChildrenOf(parentId).map { it.toDomain() }
+        dao.getDeactiveChildrenOf(parentId).map { it.toDomain() }
 
     override suspend fun getActiveChildrenOf(parentId: Long): List<Balance> =
         dao.getActiveChildrenOf(parentId).map { it.toDomain() }

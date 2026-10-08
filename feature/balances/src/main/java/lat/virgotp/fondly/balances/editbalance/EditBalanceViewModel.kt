@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import lat.virgotp.fondly.application.usecase.GetBalanceByIdUseCase
+import lat.virgotp.fondly.balances.form.BalanceFormError
+import lat.virgotp.fondly.balances.form.toFormError
 import lat.virgotp.fondly.application.usecase.ResetBalanceByIdUseCase
 import lat.virgotp.fondly.application.usecase.UpdateBalanceUseCase
 import lat.virgotp.fondly.domain.model.Balance
@@ -33,7 +35,7 @@ data class EditBalanceUiState(
     val isActive: Boolean = true,
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
-    val errorMessage: String? = null,
+    val error: BalanceFormError? = null,
     val savedSuccessfully: Boolean = false,
     // valor para renovar el balance
     val resetBalanceAndChildren: Boolean = false,
@@ -62,7 +64,7 @@ class EditBalanceViewModel @Inject constructor(
         _uiState.value = if (balance != null) {
             EditBalanceUiState(
                 name = balance.name,
-                targetAmount = balance.targetAmount.toString(),
+                targetAmount = balance.targetAmount.toPlainString(),
                 description = balance.description.orEmpty(),
                 type = balance.type,
                 periodicity = balance.periodicity,
@@ -75,12 +77,12 @@ class EditBalanceViewModel @Inject constructor(
                 isLoading = false
             )
         } else {
-            EditBalanceUiState(isLoading = false, errorMessage = "No se encontró el saldo")
+            EditBalanceUiState(isLoading = false, error = BalanceFormError.BALANCE_NOT_FOUND)
         }
     }
 
-    fun onNameChange(v: String) = _uiState.update { it.copy(name = v, errorMessage = null) }
-    fun onTargetAmountChange(v: String) = _uiState.update { it.copy(targetAmount = v, errorMessage = null) }
+    fun onNameChange(v: String) = _uiState.update { it.copy(name = v, error = null) }
+    fun onTargetAmountChange(v: String) = _uiState.update { it.copy(targetAmount = v.replace(",", "."), error = null) }
     fun onDescriptionChange(v: String) = _uiState.update { it.copy(description = v) }
     fun onTypeChange(v: BalanceType) = _uiState.update { it.copy(type = v) }
     fun onPeriodicityChange(v: Periodicity) = _uiState.update {
@@ -95,21 +97,37 @@ class EditBalanceViewModel @Inject constructor(
     fun onNotificationThresholdChange(v: String) = _uiState.update { it.copy(notificationThreshold = v) }
     fun onIsActiveChange(v: Boolean) = _uiState.update { it.copy(isActive = v) }
 
+    /** true si algún campo difiere del saldo original cargado. */
+    fun hasUnsavedChanges(): Boolean = original?.let { o ->
+        val s = _uiState.value
+        s.name != o.name ||
+            s.targetAmount.toBigDecimalOrNull() != o.targetAmount ||
+            s.description != o.description.orEmpty() ||
+            s.type != o.type ||
+            s.periodicity != o.periodicity ||
+            s.renewalDate != o.renewalDate ||
+            s.rolloverStrategy != o.rolloverStrategy ||
+            s.rebalanceStrategy != o.rebalanceStrategy ||
+            s.allowOverdraft != o.allowOverdraft ||
+            s.isActive != o.isActive ||
+            s.notificationThreshold != (o.notificationThreshold?.toString() ?: "")
+    } ?: false
+
     fun onSaveClick() {
         val state = _uiState.value
         val balance = original ?: return
-        val target = state.targetAmount.replace(",", "").toDoubleOrNull()
+        val target = state.targetAmount.toBigDecimalOrNull()
         val threshold = state.notificationThreshold.toIntOrNull()
 
         when {
-            state.name.isBlank() -> _uiState.update { it.copy(errorMessage = "El nombre no puede estar vacío") }
-            target == null || target <= 0 -> _uiState.update { it.copy(errorMessage = "Ingresa un monto objetivo válido") }
+            state.name.isBlank() -> _uiState.update { it.copy(error = BalanceFormError.EMPTY_NAME) }
+            target == null || target.signum() <= 0 -> _uiState.update { it.copy(error = BalanceFormError.INVALID_AMOUNT) }
             state.periodicity != Periodicity.NONE && state.renewalDate == null ->
-                _uiState.update { it.copy(errorMessage = "Selecciona la fecha de renovación") }
+                _uiState.update { it.copy(error = BalanceFormError.MISSING_RENEWAL_DATE) }
             threshold != null && threshold !in 0..100 ->
-                _uiState.update { it.copy(errorMessage = "El umbral debe estar entre 0 y 100") }
+                _uiState.update { it.copy(error = BalanceFormError.INVALID_THRESHOLD) }
             else -> {
-                _uiState.update { it.copy(isSaving = true, errorMessage = null) }
+                _uiState.update { it.copy(isSaving = true, error = null) }
                 viewModelScope.launch {
                     updateBalance(
                         balance.copy(
@@ -137,11 +155,10 @@ class EditBalanceViewModel @Inject constructor(
                                     }
                                 }
                                 .onFailure { e ->
-
                                     _uiState.update {
                                         it.copy(
                                             isSaving = false,
-                                            errorMessage = e.message
+                                            error = e.toFormError()
                                         )
                                     }
                                 }
@@ -149,7 +166,7 @@ class EditBalanceViewModel @Inject constructor(
                             _uiState.update { it.copy(isSaving = false, savedSuccessfully = true) }
                         }
                     }.onFailure { e ->
-                        _uiState.update { it.copy(isSaving = false, errorMessage = e.message) }
+                        _uiState.update { it.copy(isSaving = false, error = e.toFormError()) }
                     }
                 }
             }

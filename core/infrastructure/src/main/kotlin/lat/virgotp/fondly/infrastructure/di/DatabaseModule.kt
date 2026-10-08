@@ -2,6 +2,7 @@ package lat.virgotp.fondly.infrastructure.di
 
 import android.content.Context
 import androidx.room.Room
+import lat.virgotp.fondly.infrastructure.persistence.room.migration.MIGRATION_1_2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +23,10 @@ object DatabaseModule {
             context,
             FondlyDatabase::class.java,
             "fondly.db"
-        ).build()
+        )
+            // Migraciones explícitas únicamente — jamás fallbackToDestructiveMigration (ADR-0003).
+            .addMigrations(MIGRATION_1_2)
+            .build()
 
     @Provides
     fun provideBalanceDao(database: FondlyDatabase): BalanceDao =

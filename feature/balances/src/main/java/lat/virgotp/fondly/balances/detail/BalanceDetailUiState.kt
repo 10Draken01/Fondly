@@ -1,4 +1,4 @@
-package lat.virgotp.fondly.feature.balances.detail
+package lat.virgotp.fondly.balances.detail
 
 import lat.virgotp.fondly.domain.model.Balance
 

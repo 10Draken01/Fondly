@@ -1,5 +1,6 @@
 package lat.virgotp.fondly.ui_common.organisms
 
+import java.math.RoundingMode
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -28,6 +29,8 @@ import lat.virgotp.fondly.ui_common.theme.BalanceHierarchyIcons
 import lat.virgotp.fondly.ui_common.theme.BalanceSegmentColors
 import lat.virgotp.fondly.ui_common.theme.FondlySpacing
 import lat.virgotp.fondly.ui_common.theme.Motion
+import androidx.compose.ui.res.stringResource
+import lat.virgotp.fondly.uicommon.R
 import lat.virgotp.fondly.ui_common.util.buildDescendantFractions
 
 @Composable
@@ -45,7 +48,7 @@ fun BalanceCard(
     val target = balance.targetAmount
 
     // available = saldo LIBRE (no gastado ni reservado en apartados).
-    val freeFraction = if (target > 0) (balance.available / target).toFloat().coerceIn(0f, 1f) else 0f
+    val freeFraction = if (target.signum() > 0) balance.available.divide(target, 6, RoundingMode.HALF_EVEN).toFloat().coerceIn(0f, 1f) else 0f
     val freeColor = scheme.primary   // dorado en ambos temas (Gold700 / E4BC55)
     val usedColor = scheme.outline   // "vacio/consumido": neutro, obviamente distinto del dorado
 
@@ -78,6 +81,8 @@ fun BalanceCard(
         childrenByParentId = childrenByParentId,
         freeColor = scheme.primary,
         usedColor = scheme.outline,
+        freeLabel = stringResource(R.string.segment_free),
+        usedLabel = stringResource(R.string.segment_used),
         colorForLevel = colorForLevel
     )
 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English (second language). Base/defaults live in values/strings.xml (Spanish). RNF-010/RNF-011. -->
+<resources>
+    <string name="app_name">Fondly</string>
+</resources>

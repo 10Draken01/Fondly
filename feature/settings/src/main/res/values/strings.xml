@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Español (idioma base). RNF-010. -->
+<resources>
+    <string name="settings_title">Configuración</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_system">Seguir sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_currency">Moneda</string>
+    <string name="settings_currency_hint">Solo cambia cómo se muestran los montos; nunca convierte tu dinero.</string>
+    <string name="settings_footer">Fondly · Finanzas personales</string>
+</resources>
